@@ -7,6 +7,7 @@ export default defineConfig({
             input: [
                 'resources/css/login.css',
                 'resources/css/dashboard.css',
+                'resources/css/admin.css',
                 'resources/js/login.js',
                 'resources/js/dashboard.js',
             ],

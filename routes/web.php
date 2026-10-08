@@ -3,9 +3,12 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StockController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // LOGIN
@@ -28,6 +31,24 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+
+    Route::resource ('/admin/categories', CategoryController::class)
+        ->names ('admin.categories');
+
+    Route::resource('/admin/products', ProductController::class)
+        ->names('admin.products');
+
+    Route::get('/admin/stock', [StockController::class, 'index'])
+        ->name('admin.stock.index');
+
+    Route::get('/admin/stock/{product}/create', [StockController::class, 'create'])
+        ->name('admin.stock.create');
+
+    Route::post('/admin/stock/{product}', [StockController::class, 'store'])
+        ->name('admin.stock.store');
+
+    Route::get('/admin/stock/{product}/history', [StockController::class, 'history'])
+        ->name('admin.stock.history');
 
 });
 
