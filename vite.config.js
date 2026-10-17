@@ -8,6 +8,8 @@ export default defineConfig({
                 'resources/css/login.css',
                 'resources/css/dashboard.css',
                 'resources/css/admin.css',
+                'resources/css/user.css',
+                'resources/css/kasir.css',
                 'resources/js/login.js',
                 'resources/js/dashboard.js',
             ],

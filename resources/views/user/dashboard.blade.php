@@ -44,20 +44,23 @@
 
             <div class="card-grid">
 
-                <div class="card">
+                <a href="{{ route('user.products.index') }}" class="card">
                     <span>Produk</span>
                     <strong>Lihat Produk</strong>
-                </div>
+                    <p>Lihat katalog, cari produk, dan periksa harga.</p>
+                </a>
 
-                <div class="card">
+                <a href="{{ route('user.products.index') }}" class="card">
                     <span>Belanja</span>
                     <strong>Belanja Sekarang</strong>
-                </div>
+                    <p>Pilih produk dan tambahkan ke keranjang.</p>
+                </a>
 
-                <div class="card">
+                <a href="{{ route('user.orders.index') }}" class="card">
                     <span>Riwayat</span>
-                    <strong>Riwayat Belanja</strong>
-                </div>
+                    <strong>Riwayat Pesanan</strong>
+                    <p>Lihat pesanan, status, dan detail pembelian.</p>
+                </a>
 
             </div>
 

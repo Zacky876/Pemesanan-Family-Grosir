@@ -25,6 +25,18 @@ class AuthController extends Controller {
 
             $user = Auth::user();
 
+            if (!$user->is_active) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()
+                    ->withErrors([
+                        'email' => 'Akun Anda sudah dinonaktifkan.',
+                    ])
+                    ->onlyInput('email');
+            }
+
             return match ($user->role) {
                 'admin' => redirect()->route('admin.dashboard'),
                 'kasir' => redirect()->route('kasir.dashboard'),

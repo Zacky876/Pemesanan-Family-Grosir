@@ -1,0 +1,134 @@
+
+/* =========================
+   CSS KHUSUS KASIR
+   ========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #ffffff;
+    color: #000000;
+}
+
+.dashboard-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #000000;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.dashboard-card {
+    border: 1px solid #000000;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+a,
+button {
+    font-family: inherit;
+}
+
+a {
+    color: #000000;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border: 1px solid #000000;
+    background: #ffffff;
+    color: #000000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #000000;
+    color: #ffffff;
+}
+
+button {
+    padding: 8px 14px;
+    border: 1px solid #000000;
+    background: #000000;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #ffffff;
+    color: #000000;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #000000;
+    background: #ffffff;
+    color: #000000;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid #000000;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background: #000000;
+    color: #ffffff;
+}
+
+.success-message,
+.error-message {
+    border: 1px solid #000000;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.transaction-total {
+    border: 1px solid #000000;
+    padding: 15px;
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+@media (max-width: 700px) {
+    .dashboard-container {
+        width: 95%;
+        margin: 20px auto;
+    }
+
+    .dashboard-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

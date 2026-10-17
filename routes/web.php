@@ -3,9 +3,16 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\CustomerController;
+
+use App\Http\Controllers\CustomerProductController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CustomerOrderController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -50,6 +57,31 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/stock/{product}/history', [StockController::class, 'history'])
         ->name('admin.stock.history');
 
+    Route::prefix('admin/customers')->name('admin.customers.')->group(function () {
+        Route::get('/', [CustomerController::class, 'index'])
+            ->name('index');
+
+        Route::get('/create', [CustomerController::class, 'create'])
+            ->name('create');
+
+        Route::post('/', [CustomerController::class, 'store'])
+            ->name('store');
+
+        Route::get('/{customer}', [CustomerController::class, 'show'])
+            ->name('show');
+
+        Route::get('/{customer}/edit', [CustomerController::class, 'edit'])
+            ->name('edit');
+
+        Route::put('/{customer}', [CustomerController::class, 'update'])
+            ->name('update');
+
+        Route::patch('/{customer}/status', [CustomerController::class, 'toggleStatus'])
+            ->name('toggle-status');
+
+        Route::delete('/{customer}', [CustomerController::class, 'destroy'])
+            ->name('destroy');
+    });
 });
 
 // DASHBOARD Kasir
@@ -64,8 +96,39 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
 // DASHBOARD User
 Route::middleware(['auth', 'role:user'])->group(function () {
 
-    Route::get('/user/dashboard', function () {
-        return view('user.dashboard');
-    })->name('user.dashboard');
+    Route::get('/user/dashboard', [DashboardController::class, 'user'])
+        ->name('user.dashboard');
+
+    Route::prefix('user/products')->name('user.products.')->group(function () {
+        Route::get('/', [CustomerProductController::class, 'index'])
+            ->name('index');
+
+        Route::get('/{product}', [CustomerProductController::class, 'show'])
+            ->name('show');
+    });
+    Route::prefix('user/cart')->name('user.cart.')->group(function () {
+        Route::get('/', [CartController::class, 'index'])
+            ->name('index');
+        Route::post('/{product}', [CartController::class, 'add'])
+            ->name('add');
+        Route::patch('/{product}', [CartController::class, 'update'])
+            ->name('update');
+        Route::delete('/{product}', [CartController::class, 'remove'])
+            ->name('remove');
+    });
+    Route::prefix('user/checkout')->name('user.checkout.')->group(function () {
+        Route::get('/', [CheckoutController::class, 'index'])
+        ->name('index');
+        Route::post('/', [CheckoutController::class, 'store'])
+        ->name('store');
+        Route::get('/success/{transaction}', [CheckoutController::class, 'success'])
+        ->name('success');
+    });
+    Route::prefix('user/orders')->name('user.orders.')->group(function () {
+        Route::get('/', [CustomerOrderController::class, 'index'])
+            ->name('index');
+        Route::get('/{transaction}', [CustomerOrderController::class, 'show'])
+            ->name('show');
+    });
 
 });
