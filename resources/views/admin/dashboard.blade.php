@@ -59,6 +59,11 @@
                     <strong>Lihat Transaksi</strong>
                 </div>
 
+                <a href="{{ route('admin.payments.index') }}" class="card">
+                    <span>Pembayaran</span>
+                    <strong>Verifikasi Pembayaran</strong>
+                </a>
+
             </div>
 
         </main>

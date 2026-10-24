@@ -8,11 +8,11 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Models\Product;
 
-
-class CheckoutController extends Controller {
-
+class CheckoutController extends Controller
+{
     // Menampilkan halaman konfirmasi checkout
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $cart = $request->session()->get('cart', []);
 
         if (empty($cart)) {
@@ -35,7 +35,12 @@ class CheckoutController extends Controller {
                 continue;
             }
 
-            $quantity = (int) $item['quantity'];
+            $quantity = (int) ($item['quantity'] ?? 0);
+
+            if ($quantity < 1) {
+                continue;
+            }
+
             $subtotal = $product->selling_price * $quantity;
             $total += $subtotal;
 
@@ -54,8 +59,9 @@ class CheckoutController extends Controller {
         return view('user.checkout.index', compact('items', 'total'));
     }
 
-    // Menyimpan pesanan pelanggan
-    public function store(Request $request) {
+    // Menyimpan pesanan, tetapi belum mencatat penjualan
+    public function store(Request $request)
+    {
         $cart = $request->session()->get('cart', []);
 
         if (empty($cart)) {
@@ -63,7 +69,11 @@ class CheckoutController extends Controller {
                 ->with('error', 'Keranjang belanja masih kosong.');
         }
 
-        $transaction = DB::transaction(function () use ($cart, $request) {
+        $validated = $request->validate([
+            'payment_method' => ['required', 'in:qris,cash'],
+        ]);
+
+        $transaction = DB::transaction(function () use ($cart, $request, $validated) {
             $ids = array_map('intval', array_keys($cart));
 
             $products = Product::whereIn('id', $ids)
@@ -96,50 +106,57 @@ class CheckoutController extends Controller {
                 $total += $subtotal;
 
                 $details[] = [
-                    'product' => $product,
+                    'product_id' => $product->id,
                     'quantity' => $quantity,
                     'price' => $price,
                     'subtotal' => $subtotal,
                 ];
             }
 
-            $transaction = DB::table('transactions')->insertGetId([
-                'transaction_code' => 'ORD-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(5)),
+            $now = now();
+
+            $transactionId = DB::table('transactions')->insertGetId([
+                'transaction_code' => 'ORD-' . $now->format('YmdHis')
+                    . '-' . Str::upper(Str::random(5)),
                 'user_id' => $request->user()->id,
-                'transaction_date' => now(),
+                'transaction_date' => $now,
                 'total' => $total,
                 'payment' => 0,
                 'change_amount' => 0,
                 'status' => 'pending',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'payment_method' => $validated['payment_method'],
+                'payment_status' => 'pending',
+                'payment_proof' => null,
+                'paid_at' => null,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
 
             foreach ($details as $detail) {
                 DB::table('transaction_details')->insert([
-                    'transaction_id' => $transaction,
-                    'product_id' => $detail['product']->id,
+                    'transaction_id' => $transactionId,
+                    'product_id' => $detail['product_id'],
                     'quantity' => $detail['quantity'],
                     'price' => $detail['price'],
                     'subtotal' => $detail['subtotal'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]);
-
-                $detail['product']->decrement('stock', $detail['quantity']);
             }
 
-            return $transaction;
+            return $transactionId;
         });
 
         $request->session()->forget('cart');
 
-        return redirect()->route('user.checkout.success', $transaction)
-            ->with('success', 'Pesanan berhasil dibuat.');
+        return redirect()
+            ->route('user.checkout.success', $transaction)
+            ->with('success', 'Pesanan berhasil dibuat. Silakan selesaikan pembayaran.');
     }
 
-    // Menampilkan informasi pesanan yang berhasil dibuat
-    public function success(Request $request, int $transaction) {
+    // Menampilkan detail pesanan
+    public function success(Request $request, int $transaction)
+    {
         $order = DB::table('transactions')
             ->where('id', $transaction)
             ->where('user_id', $request->user()->id)
@@ -148,7 +165,12 @@ class CheckoutController extends Controller {
         abort_unless($order, 404);
 
         $items = DB::table('transaction_details')
-            ->join('products', 'transaction_details.product_id', '=', 'products.id')
+            ->join(
+                'products',
+                'transaction_details.product_id',
+                '=',
+                'products.id'
+            )
             ->where('transaction_details.transaction_id', $order->id)
             ->select(
                 'products.name',

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
@@ -14,8 +15,20 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerOrderController;
 
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentVerificationController;
+
 Route::get('/', function () {
-    return redirect()->route('login');
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
+
+    return match (Auth::user()->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'kasir' => redirect()->route('kasir.dashboard'),
+        'user' => redirect()->route('user.dashboard'),
+        default => abort(403, 'Role tidak valid.'),
+    };
 });
 
 // LOGIN
@@ -82,6 +95,20 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('/{customer}', [CustomerController::class, 'destroy'])
             ->name('destroy');
     });
+
+    Route::middleware(['auth'])->prefix('admin/payments')->name('admin.payments.')->group(function () {
+        Route::get('/', [PaymentVerificationController::class, 'index'])
+            ->name('index');
+
+        Route::get('/{transaction}/proof', [PaymentVerificationController::class, 'proof'])
+            ->name('proof');
+
+        Route::post('/{transaction}/confirm', [PaymentVerificationController::class, 'confirm'])
+            ->name('confirm');
+
+        Route::post('/{transaction}/fail', [PaymentVerificationController::class, 'fail'])
+            ->name('fail');
+    });
 });
 
 // DASHBOARD Kasir
@@ -129,6 +156,13 @@ Route::middleware(['auth', 'role:user'])->group(function () {
             ->name('index');
         Route::get('/{transaction}', [CustomerOrderController::class, 'show'])
             ->name('show');
+    });
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/user/payment/{transaction}', [PaymentController::class, 'show'])
+            ->name('user.payment.show');
+
+        Route::post('/user/payment/{transaction}/proof', [PaymentController::class, 'uploadProof'])
+            ->name('user.payment.proof');
     });
 
 });

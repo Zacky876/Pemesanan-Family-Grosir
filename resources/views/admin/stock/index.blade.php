@@ -45,53 +45,69 @@
 
     @endif
 
+    @php
+        $lowStockProducts = $products->filter(fn ($product) => $product->stock <= $product->minimum_stock);
+    @endphp
+
+    @if($lowStockProducts->isNotEmpty())
+        <div class="success-message"
+            style="background: #fff3cd; color: #856404; margin-bottom: 16px;">
+            <strong>Perhatian!</strong>
+            Ada {{ $lowStockProducts->count() }}
+            produk dengan stok hampir habis.
+
+            <ul>
+                @foreach($lowStockProducts as $product)
+                    <li>
+                        {{ $product->name }}:
+                        stok {{ $product->stock }},
+                        minimum {{ $product->minimum_stock }}
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="dashboard-card">
 
         <table>
-
             <thead>
-
                 <tr>
                     <th>No</th>
                     <th>Kode</th>
                     <th>Produk</th>
                     <th>Kategori</th>
                     <th>Stok</th>
+                    <th>Stok Minimum</th>
                     <th>Satuan</th>
-                    <th>Status</th>
+                    <th>Status Stok</th>
+                    <th>Status Produk</th>
                     <th>Aksi</th>
                 </tr>
-
             </thead>
 
             <tbody>
-
                 @forelse($products as $product)
-
                     <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $product->code }}</td>
+                        <td>{{ $product->name }}</td>
+                        <td>{{ $product->category->name ?? '-' }}</td>
+                        <td>{{ $product->stock }}</td>
+                        <td>{{ $product->minimum_stock }}</td>
+
+                        <td>{{ $product->unit }}</td>
 
                         <td>
-                            {{ $loop->iteration }}
-                        </td>
-
-                        <td>
-                            {{ $product->code }}
-                        </td>
-
-                        <td>
-                            {{ $product->name }}
-                        </td>
-
-                        <td>
-                            {{ $product->category->name }}
-                        </td>
-
-                        <td>
-                            {{ $product->stock }}
-                        </td>
-
-                        <td>
-                            {{ $product->unit }}
+                            @if($product->stock <= $product->minimum_stock)
+                                <strong style="color: #c62828;">
+                                    Stok Hampir Habis
+                                </strong>
+                            @else
+                                <span style="color: #2e7d32;">
+                                    Stok Aman
+                                </span>
+                            @endif
                         </td>
 
                         <td>
@@ -99,7 +115,6 @@
                         </td>
 
                         <td>
-
                             <a
                                 href="{{ route('admin.stock.create', $product) }}"
                                 class="btn">
@@ -111,23 +126,14 @@
                                 class="btn">
                                 Riwayat
                             </a>
-
                         </td>
-
                     </tr>
-
                 @empty
-
                     <tr>
-                        <td colspan="8">
-                            Belum ada produk.
-                        </td>
+                        <td colspan="10">Belum ada produk.</td>
                     </tr>
-
                 @endforelse
-
             </tbody>
-
         </table>
 
     </div>

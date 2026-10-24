@@ -8,10 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class StockController extends Controller
-{
-    public function index()
-    {
+class StockController extends Controller {
+    public function index() {
         $products = Product::with('category')
             ->orderBy('name')
             ->get();
@@ -19,49 +17,63 @@ class StockController extends Controller
         return view('admin.stock.index', compact('products'));
     }
 
-    public function create(Product $product)
-    {
+    public function create(Product $product) {
         return view('admin.stock.create', compact('product'));
     }
 
-    public function store(Request $request, Product $product)
-    {
+    public function store(Request $request, Product $product) {
         $validated = $request->validate([
-            'type' => ['required', 'in:in,out'],
-            'quantity' => ['required', 'integer', 'min:1'],
-            'reason' => ['nullable', 'string', 'max:255'],
+            'type' => ['required', 'in:in,out,adjustment'],
+            'quantity' => ['required', 'integer', 'min:0'],
+            'reason' => ['required', 'string', 'max:255'],
         ]);
 
         if (
-            $validated['type'] === 'out' &&
-            $product->stock < $validated['quantity']
+            $validated['type'] !== 'adjustment'
+            && $validated['quantity'] < 1
         ) {
             return back()
-                ->withErrors([
-                    'quantity' => 'Stok tidak mencukupi.',
-                ])
+                ->withErrors(['quantity' => 'Jumlah harus minimal 1.'])
                 ->withInput();
         }
 
         DB::transaction(function () use ($validated, $product) {
+            $lockedProduct = Product::whereKey($product->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            $stockBefore = $product->stock;
+            $stockBefore = $lockedProduct->stock;
+            $type = $validated['type'];
+            $quantity = $validated['quantity'];
 
-            if ($validated['type'] === 'in') {
-                $product->stock += $validated['quantity'];
+            if ($type === 'in') {
+                $stockAfter = $stockBefore + $quantity;
+            } elseif ($type === 'out') {
+                if ($stockBefore < $quantity) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'quantity' => 'Stok tidak mencukupi.',
+                    ]);
+                }
+
+                $stockAfter = $stockBefore - $quantity;
             } else {
-                $product->stock -= $validated['quantity'];
+                // Quantity adalah jumlah stok fisik terbaru.
+                $stockAfter = $quantity;
+
+                // Catat selisih stok pada riwayat.
+                $quantity = abs($stockAfter - $stockBefore);
             }
 
-            $product->save();
+            $lockedProduct->stock = $stockAfter;
+            $lockedProduct->save();
 
             StockHistory::create([
-                'product_id' => $product->id,
-                'type' => $validated['type'],
-                'quantity' => $validated['quantity'],
+                'product_id' => $lockedProduct->id,
+                'type' => $type,
+                'quantity' => $quantity,
                 'stock_before' => $stockBefore,
-                'stock_after' => $product->stock,
-                'reason' => $validated['reason'] ?? null,
+                'stock_after' => $stockAfter,
+                'reason' => $validated['reason'],
                 'user_id' => Auth::id(),
             ]);
         });
@@ -71,8 +83,7 @@ class StockController extends Controller
             ->with('success', 'Stok berhasil diperbarui.');
     }
 
-    public function history(Product $product)
-    {
+    public function history(Product $product) {
         $histories = $product->stockHistories()
             ->with('user')
             ->latest()

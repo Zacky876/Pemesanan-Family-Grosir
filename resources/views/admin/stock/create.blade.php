@@ -68,65 +68,54 @@
             @csrf
 
             <div class="form-group">
+                <label for="type">Jenis Perubahan</label>
 
-                <label for="type">
-                    Jenis Perubahan
-                </label>
-
-                <select
-                    name="type"
-                    id="type"
-                    required>
-
-                    <option value="in">
+                <select name="type" id="type" required>
+                    <option value="in" {{ old('type') == 'in' ? 'selected' : '' }}>
                         Stok Masuk
                     </option>
 
-                    <option value="out">
+                    <option value="out" {{ old('type') == 'out' ? 'selected' : '' }}>
                         Stok Keluar
                     </option>
 
+                    <option value="adjustment" {{ old('type') == 'adjustment' ? 'selected' : '' }}>
+                        Penyesuaian Stok
+                    </option>
                 </select>
-
             </div>
 
             <div class="form-group">
-
-                <label for="quantity">
-                    Jumlah
-                </label>
+                <label for="quantity">Jumlah</label>
 
                 <input
                     type="number"
                     name="quantity"
                     id="quantity"
-                    min="1"
+                    min="0"
                     value="{{ old('quantity') }}"
                     required>
 
+                <small>
+                    Untuk stok masuk/keluar, isi jumlah perubahan.
+                    Untuk penyesuaian, isi jumlah stok fisik terbaru.
+                </small>
             </div>
 
             <div class="form-group">
-
-                <label for="reason">
-                    Alasan / Keterangan
-                </label>
+                <label for="reason">Alasan / Keterangan</label>
 
                 <textarea
                     name="reason"
                     id="reason"
                     rows="4"
-                    placeholder="Contoh: Restock dari supplier">{{ old('reason') }}</textarea>
-
+                    placeholder="Contoh: Restock supplier atau hasil stok opname"
+                    required>{{ old('reason') }}</textarea>
             </div>
 
-            <button type="submit">
-                Simpan Perubahan
-            </button>
+            <button type="submit">Simpan Perubahan</button>
 
-            <a
-                href="{{ route('admin.stock.index') }}"
-                class="btn">
+            <a href="{{ route('admin.stock.index') }}" class="btn">
                 Batal
             </a>
 
