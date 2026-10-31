@@ -33,5 +33,6 @@ class Product extends Model {
 
     public function stockHistories() {
         return $this->hasMany(StockHistory::class);
+        return $this->hasMany(TransactionDetail::class);
     }
 }

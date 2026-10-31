@@ -44,10 +44,10 @@
 
             <div class="card-grid">
 
-                <div class="card">
+                <a href="{{ route('kasir.pos') }}" class="card">
                     <span>Transaksi</span>
                     <strong>Transaksi Baru</strong>
-                </div>
+                </a>
 
                 <div class="card">
                     <span>Produk</span>

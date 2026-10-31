@@ -18,6 +18,8 @@ use App\Http\Controllers\CustomerOrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentVerificationController;
 
+use App\Http\Controllers\CashierController;
+
 Route::get('/', function () {
     if (!Auth::check()) {
         return redirect()->route('login');
@@ -114,9 +116,26 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 // DASHBOARD Kasir
 Route::middleware(['auth', 'role:kasir'])->group(function () {
 
-    Route::get('/kasir/dashboard', function () {
-        return view('kasir.dashboard');
-    })->name('kasir.dashboard');
+    Route::get('/kasir/dashboard', [CashierController::class, 'dashboard'])
+        ->name('kasir.dashboard');
+
+    Route::get('/kasir/pos', [CashierController::class, 'pos'])
+        ->name('kasir.pos');
+    
+    Route::post('/kasir/pos/cart/{product}', [CashierController::class, 'addToCart'])
+        ->name('kasir.cart.add');
+
+    Route::put('/kasir/pos/cart/{product}', [CashierController::class, 'updateCart'])
+        ->name('kasir.cart.update');
+
+    Route::delete('/kasir/pos/cart/{product}', [CashierController::class, 'removeFromCart'])
+        ->name('kasir.cart.remove');
+    
+    Route::post('/kasir/transaction', [CashierController::class, 'store'])
+        ->name('kasir.transaction.store');
+
+    Route::get('/kasir/transaction/{transaction}/receipt', [CashierController::class, 'receipt'])
+        ->name('kasir.transaction.receipt');
 
 });
 

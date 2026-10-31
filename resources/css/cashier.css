@@ -1,0 +1,549 @@
+
+/* ========================================
+   RESET DAN DASAR
+======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f5f7;
+    color: #222;
+}
+
+.cashier-container {
+    min-height: 100vh;
+}
+
+
+/* ========================================
+   HEADER KASIR
+======================================== */
+
+.cashier-header {
+    background: #fff;
+    padding: 22px 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.cashier-header h1 {
+    font-size: 26px;
+    margin-bottom: 6px;
+}
+
+.cashier-header p {
+    color: #666;
+}
+
+.back-button {
+    background: #222;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 7px;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    background: #444;
+}
+
+.cashier-content {
+    padding: 30px 35px;
+}
+
+
+/* ========================================
+   LAYOUT POS
+======================================== */
+
+.pos-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 25px;
+    align-items: start;
+}
+
+.product-panel {
+    min-width: 0;
+}
+
+
+/* ========================================
+   JUDUL HALAMAN
+======================================== */
+
+.page-title {
+    background: white;
+    padding: 25px;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.page-title h2 {
+    margin-bottom: 8px;
+}
+
+.page-title p {
+    color: #666;
+}
+
+
+/* ========================================
+   PENCARIAN PRODUK
+======================================== */
+
+.search-section {
+    margin-bottom: 25px;
+}
+
+.search-section form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-section input {
+    width: 350px;
+    max-width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.search-section button,
+.reset-button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 7px;
+    background: #222;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.search-section button:hover {
+    background: #444;
+}
+
+.reset-button {
+    background: #777;
+}
+
+.reset-button:hover {
+    background: #555;
+}
+
+
+/* ========================================
+   DAFTAR PRODUK
+======================================== */
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.product-card {
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+}
+
+.product-image {
+    width: 100%;
+    height: 170px;
+    background: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-image {
+    color: #888;
+    font-size: 14px;
+}
+
+.product-info {
+    padding: 16px;
+}
+
+.product-code {
+    color: #888;
+    font-size: 12px;
+}
+
+.product-info h3 {
+    margin: 9px 0;
+    font-size: 16px;
+}
+
+.product-category {
+    color: #777;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.product-price {
+    font-weight: bold;
+    font-size: 17px;
+    margin-bottom: 8px;
+}
+
+.product-stock {
+    color: #555;
+    font-size: 13px;
+}
+
+
+/* ========================================
+   TOMBOL TAMBAH PRODUK
+======================================== */
+
+.add-button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 11px;
+    border: none;
+    border-radius: 6px;
+    background: #222;
+    color: white;
+    cursor: pointer;
+}
+
+.add-button:hover {
+    background: #444;
+}
+
+
+/* ========================================
+   PRODUK KOSONG DAN PAGINATION
+======================================== */
+
+.empty-product {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    grid-column: 1 / -1;
+}
+
+.empty-product p {
+    margin-top: 8px;
+    color: #777;
+}
+
+.pagination {
+    margin-top: 25px;
+}
+
+
+/* ========================================
+   SIDEBAR KERANJANG
+======================================== */
+
+.cart-sidebar {
+    position: sticky;
+    top: 20px;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 20px;
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+
+.cart-header span {
+    color: #777;
+    font-size: 13px;
+}
+
+.cart-items {
+    overflow-y: auto;
+    min-height: 0;
+    flex: 1;
+}
+
+.cart-item {
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cart-item-info strong {
+    font-size: 14px;
+}
+
+.cart-item-info span {
+    color: #777;
+    font-size: 12px;
+}
+
+.cart-item-subtotal {
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+
+/* ========================================
+   JUMLAH DAN TOMBOL KERANJANG
+======================================== */
+
+.cart-item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.quantity-form {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.quantity-form input {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.update-button,
+.remove-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    font-size: 12px;
+}
+
+.update-button {
+    background: #555;
+}
+
+.update-button:hover {
+    background: #333;
+}
+
+.remove-button {
+    background: #b42318;
+}
+
+.remove-button:hover {
+    background: #8f1c14;
+}
+
+
+/* ========================================
+   TOTAL KERANJANG
+======================================== */
+
+.cart-footer {
+    flex-shrink: 0;
+    border-top: 1px solid #ddd;
+    padding-top: 15px;
+    margin-top: 10px;
+}
+
+.cart-total {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cart-total span {
+    color: #666;
+    font-size: 14px;
+}
+
+.cart-total strong {
+    font-size: 23px;
+}
+
+
+/* ========================================
+   KERANJANG KOSONG
+======================================== */
+
+.empty-cart {
+    padding: 35px 15px;
+    text-align: center;
+    background: #f8f8f8;
+    border-radius: 8px;
+}
+
+.empty-cart p {
+    margin-top: 8px;
+    color: #777;
+}
+
+
+/* ========================================
+   PESAN SUKSES DAN ERROR
+======================================== */
+
+.success-message {
+    background: #e5f6e9;
+    color: #216b35;
+    padding: 14px;
+    border-radius: 7px;
+    margin-bottom: 20px;
+}
+
+.error-message {
+    padding: 14px;
+    margin-bottom: 20px;
+    border-radius: 7px;
+    background: #fde8e7;
+    color: #a32119;
+}
+
+
+/* ========================================
+   RESPONSIVE TABLET
+======================================== */
+
+@media (max-width: 1100px) {
+    .pos-layout {
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 15px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* ========================================
+   RESPONSIVE MOBILE
+======================================== */
+
+@media (max-width: 750px) {
+    .cashier-header {
+        padding: 18px;
+    }
+
+    .cashier-content {
+        padding: 20px 15px;
+    }
+
+    .pos-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .cart-sidebar {
+        position: static;
+        max-height: 450px;
+        order: -1;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .search-section input {
+        width: 100%;
+    }
+}
+
+
+/* ========================================
+   RESPONSIVE HP KECIL
+======================================== */
+
+@media (max-width: 450px) {
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-title {
+        padding: 18px;
+    }
+
+    .cart-sidebar {
+        padding: 15px;
+    }
+
+    .cart-total strong {
+        font-size: 20px;
+    }
+}
+
+.payment-section {
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.payment-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.payment-section input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 12px;
+}
+
+.pay-button {
+    width: 100%;
+    padding: 12px;
+    background: #222;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pay-button:hover {
+    background: #444;
+}
+
