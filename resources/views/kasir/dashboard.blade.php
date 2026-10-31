@@ -49,15 +49,15 @@
                     <strong>Transaksi Baru</strong>
                 </a>
 
-                <div class="card">
+                {{-- <div class="card">
                     <span>Produk</span>
                     <strong>Lihat Produk</strong>
-                </div>
+                </div> --}}
 
-                <div class="card">
-                    <span>Riwayat</span>
+                <a href="{{ route('kasir.history') }}" class="card">
+                    <span>Transaksi</span>
                     <strong>Riwayat Transaksi</strong>
-                </div>
+                </a>
 
             </div>
 

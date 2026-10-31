@@ -1,85 +1,133 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Pesanan</title>
-    @vite(['resources/css/user.css'])
+    <title>Riwayat Pembelian</title>
+
+    @vite(['resources/css/transactions.css'])
 </head>
 <body>
-    <main class="dashboard-container">
-        <div class="dashboard-header">
-            <div>
-                <h1>Riwayat Pesanan</h1>
-                <p>Lihat pesanan dan status pembelian kamu.</p>
-            </div>
 
-            <a href="{{ route('user.products.index') }}" class="btn">
-                Kembali Belanja
+<div class="transaction-container">
+
+    <h2>Riwayat Pembelian Saya</h2>
+
+    <form action="{{ route('user.orders.index') }}"
+          method="GET"
+          class="filter-form">
+
+        <div class="filter-group">
+            <label for="search">Cari Transaksi</label>
+
+            <input
+                type="text"
+                id="search"
+                name="search"
+                placeholder="Cari kode transaksi..."
+                value="{{ request('search') }}"
+            >
+        </div>
+
+        <div class="filter-group">
+            <label for="status">Status Pesanan</label>
+
+            <select name="status" id="status">
+                <option value="">Semua Status</option>
+
+                <option value="pending"
+                    {{ request('status') == 'pending' ? 'selected' : '' }}>
+                    Pending
+                </option>
+
+                <option value="completed"
+                    {{ request('status') == 'completed' ? 'selected' : '' }}>
+                    Completed
+                </option>
+
+                <option value="cancelled"
+                    {{ request('status') == 'cancelled' ? 'selected' : '' }}>
+                    Cancelled
+                </option>
+            </select>
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="filter-button">
+                Cari
+            </button>
+
+            <a href="{{ route('user.orders.index') }}"
+               class="reset-button">
+                Reset
             </a>
         </div>
 
-        @if (session('success'))
-            <div class="success-message">
-                {{ session('success') }}
-            </div>
-        @endif
+    </form>
 
-        <section class="dashboard-card">
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Kode Pesanan</th>
-                            <th>Tanggal</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($orders as $order)
-                            <tr>
-                                <td>{{ $order->transaction_code }}</td>
-                                <td>
-                                    {{ \Carbon\Carbon::parse($order->transaction_date)->format('d-m-Y H:i') }}
-                                </td>
-                                <td>
-                                    Rp {{ number_format($order->total, 0, ',', '.') }}
-                                </td>
-                                <td>
-                                    @if ($order->status === 'pending')
-                                        Menunggu diproses
-                                    @elseif ($order->status === 'completed')
-                                        Selesai
-                                    @elseif ($order->status === 'cancelled')
-                                        Dibatalkan
-                                    @else
-                                        {{ ucfirst($order->status) }}
-                                    @endif
-                                </td>
-                                <td>
-                                    <a href="{{ route('user.orders.show', $order->id) }}" class="btn">
-                                        Detail
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5">
-                                    Kamu belum memiliki pesanan.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+    <table class="transaction-table">
 
-            <div style="margin-top: 20px;">
-                {{ $orders->links() }}
-            </div>
-        </section>
-    </main>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Kode Transaksi</th>
+                <th>Tanggal</th>
+                <th>Total</th>
+                <th>Status Pesanan</th>
+                <th>Status Pembayaran</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @forelse ($orders as $order)
+                <tr>
+                    <td>
+                        {{ $orders->firstItem() + $loop->index }}
+                    </td>
+
+                    <td>{{ $order->transaction_code }}</td>
+
+                    <td>
+                        {{ $order->transaction_date->format('d-m-Y H:i') }}
+                    </td>
+
+                    <td>
+                        Rp{{ number_format($order->total, 0, ',', '.') }}
+                    </td>
+
+                    <td>{{ ucfirst($order->status) }}</td>
+
+                    <td>{{ ucfirst($order->payment_status ?? 'pending') }}</td>
+
+                    <td>
+                        <a
+                            href="{{ route('user.orders.show', $order->id) }}"
+                            class="detail-link"
+                        >
+                            Detail
+                        </a>
+                    </td>
+                </tr>
+
+            @empty
+                <tr>
+                    <td colspan="7" style="text-align:center;">
+                        Belum ada riwayat pembelian.
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+
+    </table>
+
+    {{ $orders->links() }}
+
+    <p>
+        <a href="{{ route('user.dashboard') }}">Kembali ke Dashboard</a>
+    </p>
+
+</div>
+
 </body>
 </html>

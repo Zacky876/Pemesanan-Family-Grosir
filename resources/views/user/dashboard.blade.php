@@ -57,9 +57,8 @@
                 </a>
 
                 <a href="{{ route('user.orders.index') }}" class="card">
-                    <span>Riwayat</span>
-                    <strong>Riwayat Pesanan</strong>
-                    <p>Lihat pesanan, status, dan detail pembelian.</p>
+                    <span>Pembelian</span>
+                    <strong>Riwayat Pembelian</strong>
                 </a>
 
             </div>

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
+
 class CashierController extends Controller
 {
     // Dashboard kasir
@@ -249,5 +250,43 @@ class CashierController extends Controller
         $transaction->load('user', 'details.product');
 
         return view('kasir.receipt', compact('transaction'));
+    }
+
+    // Menampilkan riwayat transaksi kasir
+    public function history(Request $request) {
+        $query = Transaction::with('user')
+            ->where('user_id', Auth::id())
+            ->latest('transaction_date');
+
+        // Pencarian kode transaksi
+        if ($request->filled('search')) {
+            $query->where(
+                'transaction_code',
+                'like',
+                '%' . $request->search . '%'
+            );
+        }
+
+        // Filter tanggal mulai
+        if ($request->filled('start_date')) {
+            $query->whereDate(
+                'transaction_date',
+                '>=',
+                $request->start_date
+            );
+        }
+
+        // Filter tanggal akhir
+        if ($request->filled('end_date')) {
+            $query->whereDate(
+                'transaction_date',
+                '<=',
+                $request->end_date
+            );
+        }
+
+        $transactions = $query->paginate(10)->withQueryString();
+
+        return view('kasir.history', compact('transactions'));
     }
 }

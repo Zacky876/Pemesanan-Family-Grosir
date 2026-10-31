@@ -12,6 +12,8 @@ export default defineConfig({
                 'resources/css/kasir.css',
                 'resources/css/cashier.css',
                 'resources/css/receipt.css',
+                'resources/css/transactions.css',
+                'resources/css/reports.css',
                 'resources/js/login.js',
                 'resources/js/dashboard.js',
                 'resources/js/cashier.js',

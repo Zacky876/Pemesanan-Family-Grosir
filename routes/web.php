@@ -9,6 +9,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ReportController;
 
 use App\Http\Controllers\CustomerProductController;
 use App\Http\Controllers\CartController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentVerificationController;
 
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\TransactionController;
 
 Route::get('/', function () {
     if (!Auth::check()) {
@@ -111,6 +113,31 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/{transaction}/fail', [PaymentVerificationController::class, 'fail'])
             ->name('fail');
     });
+
+    // Riwayat Transaksi Admin
+    Route::prefix('admin/transactions')->name('admin.transactions.')->group(function () {
+
+        Route::get('/', [TransactionController::class, 'index'])
+            ->name('index');
+
+        Route::get('/{transaction}', [TransactionController::class, 'show'])
+            ->name('show');
+
+    });
+
+    // Laporan Admin
+    Route::prefix('admin/reports')->name('admin.reports.')->group(function () {
+
+        Route::get('/', [ReportController::class, 'index'])
+            ->name('index');
+
+        Route::get('/sales', [ReportController::class, 'sales'])
+            ->name('sales');
+
+        Route::get('/stock', [ReportController::class, 'stock'])
+            ->name('stock');
+
+    });
 });
 
 // DASHBOARD Kasir
@@ -136,6 +163,9 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
 
     Route::get('/kasir/transaction/{transaction}/receipt', [CashierController::class, 'receipt'])
         ->name('kasir.transaction.receipt');
+    // Riwayat transaksi kasir
+    Route::get('/kasir/history', [CashierController::class, 'history'])
+        ->name('kasir.history');
 
 });
 

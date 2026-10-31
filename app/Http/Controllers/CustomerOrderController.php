@@ -2,48 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Transaction;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
+class CustomerOrderController extends Controller
+{
+    // Menampilkan riwayat pembelian pelanggan
+    public function index(Request $request)
+    {
+        $query = Transaction::where('user_id', $request->user()->id)
+            ->latest('transaction_date');
 
-class CustomerOrderController extends Controller {
+        // Pencarian kode transaksi
+        if ($request->filled('search')) {
+            $query->where(
+                'transaction_code',
+                'like',
+                '%' . $request->search . '%'
+            );
+        }
 
-    // Menampilkan riwayat pesanan pelanggan
-    public function index(Request $request) {
-        $orders = DB::table('transactions')
-            ->where('user_id', $request->user()->id)
-            ->orderByDesc('transaction_date')
-            ->paginate(10);
+        // Filter status pesanan
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->paginate(10)->withQueryString();
 
         return view('user.orders.index', compact('orders'));
     }
 
-    // Menampilkan detail pesanan milik pelanggan
-    public function show(Request $request, int $transaction) {
-        $order = DB::table('transactions')
-            ->where('id', $transaction)
+    // Menampilkan detail pembelian pelanggan
+    public function show(Request $request, int $transaction)
+    {
+        $order = Transaction::with('details.product')
             ->where('user_id', $request->user()->id)
-            ->first();
+            ->findOrFail($transaction);
 
-        abort_unless($order, 404);
-
-        $items = DB::table('transaction_details')
-            ->join(
-                'products',
-                'transaction_details.product_id',
-                '=',
-                'products.id'
-            )
-            ->where('transaction_details.transaction_id', $order->id)
-            ->select(
-                'products.name',
-                'products.code',
-                'transaction_details.quantity',
-                'transaction_details.price',
-                'transaction_details.subtotal'
-            )
-            ->get();
-
-        return view('user.orders.show', compact('order', 'items'));
+        return view('user.orders.show', compact('order'));
     }
 }
