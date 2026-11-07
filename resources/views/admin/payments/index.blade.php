@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifikasi Pembayaran</title>
-    @vite(['resources/css/admin.css'])
+    
+    @vite(['resources/css/admin/admin.css'])
 </head>
 <body>
     <main class="dashboard-container">

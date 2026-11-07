@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pembayaran QRIS</title>
-    @vite(['resources/css/user.css'])
+    
+    @vite(['resources/css/user/user.css'])
 </head>
 <body>
     <main class="dashboard-container">

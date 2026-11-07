@@ -9,8 +9,8 @@
     <title>POS Kasir</title>
 
     @vite([
-        'resources/css/cashier.css',
-        'resources/js/cashier.js'
+        'resources/css/kasir/cashier.css',
+        'resources/js/kasir/cashier.js'
     ])
 </head>
 

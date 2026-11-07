@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Produk</title>
-    @vite(['resources/css/user.css'])
+    @vite(['resources/css/user/user.css'])
 </head>
 <body>
     <div class="dashboard-container">

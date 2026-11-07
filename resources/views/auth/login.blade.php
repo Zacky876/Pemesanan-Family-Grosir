@@ -59,6 +59,11 @@
                     Masuk
                 </button>
 
+                <p class="register-link">
+                    Belum memiliki akun?
+                    <a href="{{ route('register') }}">Daftar sekarang</a>
+                </p>
+
             </form>
 
         </div>

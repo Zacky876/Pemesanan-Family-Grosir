@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Admin</title>
 
-    @vite(['resources/css/reports.css'])
+    @vite(['resources/css/admin/reports.css'])
 </head>
 <body>
 

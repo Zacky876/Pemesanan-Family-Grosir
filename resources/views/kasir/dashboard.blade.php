@@ -7,7 +7,7 @@
 
     <title>Dashboard Kasir</title>
 
-    @vite(['resources/css/dashboard.css', 'resources/js/dashboard.js'])
+    @vite(['resources/css/kasir/dashboard.css', 'resources/js/kasir/dashboard.js'])
 </head>
 
 <body>

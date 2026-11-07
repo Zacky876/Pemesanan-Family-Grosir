@@ -44,6 +44,15 @@ Route::post('/login', [AuthController::class, 'login'])
     ->middleware('guest')
     ->name('login.process');
 
+// REGISTER
+Route::get('/register', [AuthController::class, 'showRegister'])
+    ->middleware('guest')
+    ->name('register');
+
+Route::post('/register', [AuthController::class, 'register'])
+    ->middleware('guest')
+    ->name('register.process');
+
 // LOGOUT
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')

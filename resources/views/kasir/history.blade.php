@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riwayat Transaksi Kasir</title>
 
-    @vite(['resources/css/transactions.css'])
+    @vite(['resources/css/kasir/transactions.css'])
 </head>
 <body>
 

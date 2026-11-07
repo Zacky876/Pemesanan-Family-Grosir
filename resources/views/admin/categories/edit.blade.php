@@ -6,9 +6,7 @@
 
     <title>Edit Kategori</title>
 
-    @vite([
-        'resources/css/admin.css'
-    ])
+    @vite(['resources/css/admin/admin.css'])
 </head>
 
 <body>
