@@ -1,24 +1,35 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
-import { bunny } from 'laravel-vite-plugin/fonts';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
-            refresh: true,
-            fonts: [
-                bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
-                }),
+            input: [
+                'resources/css/login.css',
+                'resources/css/register.css',
+
+                'resources/css/admin/dashboard.css',
+                'resources/css/admin/admin.css',
+                'resources/css/admin/transactions.css',
+                'resources/css/admin/reports.css',
+                'resources/js/admin/dashboard.js',
+
+                'resources/css/kasir/dashboard.css',
+                'resources/css/kasir/kasir.css',
+                'resources/css/kasir/cashier.css',
+                'resources/css/kasir/receipt.css',
+                'resources/css/kasir/transactions.css',
+                'resources/js/kasir/dashboard.js',
+                'resources/js/kasir/cashier.js',
+
+                'resources/css/user/dashboard.css',
+                'resources/css/user/user.css',
+                'resources/css/user/transactions.css',
+                'resources/js/user/dashboard.js',
+
+                'resources/js/login.js',
             ],
+            refresh: true,
         }),
-        tailwindcss(),
     ],
-    server: {
-        watch: {
-            ignored: ['**/storage/framework/views/**'],
-        },
-    },
 });
