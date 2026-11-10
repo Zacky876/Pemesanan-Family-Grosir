@@ -1,120 +1,78 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('admin.layouts.app')
 
-    <title>Detail Produk</title>
+@section('title', 'Detail Produk')
+@section('page_title', 'Detail Produk')
+@section('page_subtitle', 'Informasi lengkap produk.')
 
-    @vite(['resources/css/admin/admin.css'])
-</head>
+@push('styles')
+    @vite('resources/css/admin/products.css')
+@endpush
 
-<body>
+@section('content')
+<div class="product-page">
 
-<div class="dashboard-container">
+    <div class="product-toolbar">
+        <a href="{{ route('admin.products.index') }}" class="product-btn product-btn--ghost">
+            Kembali
+        </a>
 
-    <div class="dashboard-header">
-
-        <div>
-            <h1>Detail Produk</h1>
-            <p>Informasi lengkap produk.</p>
-        </div>
-
-        <div>
-
-            <a
-                href="{{ route('admin.products.index') }}"
-                class="btn">
-                Kembali
-            </a>
-
-            <a
-                href="{{ route('admin.products.edit', $product) }}"
-                class="btn">
-                Edit
-            </a>
-
-        </div>
-
+        <a href="{{ route('admin.products.edit', $product) }}" class="product-btn">
+            Edit produk
+        </a>
     </div>
 
-    <div class="dashboard-card">
+    <div class="product-card product-detail">
 
-        @if($product->photo)
+        {{-- Foto --}}
+        <div>
+            @if ($product->photo)
+                <img src="{{ asset('storage/' . $product->photo) }}"
+                     alt="{{ $product->name }}"
+                     class="product-photo product-photo--large">
+            @else
+                <div class="product-photo-empty">Belum ada foto</div>
+            @endif
+        </div>
 
-            <div style="margin-bottom: 20px;">
+        {{-- Informasi --}}
+        <dl class="product-dl">
 
-                <img
-                    src="{{ asset('storage/' . $product->photo) }}"
-                    alt="{{ $product->name }}"
-                    style="width:200px;height:200px;object-fit:cover;">
+            <dt>Kode produk</dt>
+            <dd>{{ $product->code }}</dd>
 
-            </div>
+            <dt>Nama produk</dt>
+            <dd><strong>{{ $product->name }}</strong></dd>
 
-        @endif
+            <dt>Kategori</dt>
+            <dd>{{ $product->category->name ?? '-' }}</dd>
 
-        <table>
+            <dt>Harga beli</dt>
+            <dd>Rp {{ number_format($product->purchase_price, 0, ',', '.') }}</dd>
 
-            <tr>
-                <th>Kode Produk</th>
-                <td>{{ $product->code }}</td>
-            </tr>
+            <dt>Harga jual</dt>
+            <dd>Rp {{ number_format($product->selling_price, 0, ',', '.') }}</dd>
 
-            <tr>
-                <th>Nama Produk</th>
-                <td>{{ $product->name }}</td>
-            </tr>
+            <dt>Stok</dt>
+            <dd>{{ $product->stock }} {{ $product->unit }}</dd>
 
-            <tr>
-                <th>Kategori</th>
-                <td>{{ $product->category->name }}</td>
-            </tr>
+            <dt>Satuan</dt>
+            <dd>{{ $product->unit }}</dd>
 
-            <tr>
-                <th>Harga Beli</th>
-                <td>
-                    Rp {{ number_format($product->purchase_price, 0, ',', '.') }}
-                </td>
-            </tr>
+            <dt>Status</dt>
+            <dd>
+                @if ($product->status == 'active')
+                    <span class="product-badge product-badge--active">Aktif</span>
+                @else
+                    <span class="product-badge product-badge--inactive">Tidak aktif</span>
+                @endif
+            </dd>
 
-            <tr>
-                <th>Harga Jual</th>
-                <td>
-                    Rp {{ number_format($product->selling_price, 0, ',', '.') }}
-                </td>
-            </tr>
+            <dt>Deskripsi</dt>
+            <dd>{{ $product->description ?: '-' }}</dd>
 
-            <tr>
-                <th>Stok</th>
-                <td>
-                    {{ $product->stock }} {{ $product->unit }}
-                </td>
-            </tr>
-
-            <tr>
-                <th>Satuan</th>
-                <td>{{ $product->unit }}</td>
-            </tr>
-
-            <tr>
-                <th>Status</th>
-                <td>
-                    {{ $product->status == 'active' ? 'Aktif' : 'Tidak Aktif' }}
-                </td>
-            </tr>
-
-            <tr>
-                <th>Deskripsi</th>
-                <td>
-                    {{ $product->description ?: '-' }}
-                </td>
-            </tr>
-
-        </table>
+        </dl>
 
     </div>
 
 </div>
-
-</body>
-</html>
+@endsection

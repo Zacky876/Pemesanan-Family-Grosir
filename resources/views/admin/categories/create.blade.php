@@ -1,73 +1,62 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('admin.layouts.app')
 
-    <title>Tambah Kategori</title>
+@section('title', 'Tambah Kategori')
+@section('page_title', 'Tambah Kategori')
+@section('page_subtitle', 'Tambahkan kategori baru untuk mengelompokkan produk.')
 
-    @vite(['resources/css/admin/admin.css'])
-</head>
+@push('styles')
+    @vite('resources/css/admin/categories.css')
+@endpush
 
-<body>
+@section('content')
+<div class="category-page">
 
-    <div class="dashboard-container">
-
-        <h1>Tambah Kategori</h1>
-
-        @if($errors->any())
-            <div class="error-message">
-                <ul>
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <div class="dashboard-card">
-
-            <form action="{{ route('admin.categories.store') }}" method="POST">
-
-                @csrf
-
-                <div>
-                    <label for="name">Nama Kategori</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value="{{ old('name') }}"
-                        required
-                    >
-                </div>
-
-                <br>
-
-                <div>
-                    <label for="description">Deskripsi</label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        rows="4"
-                    >{{ old('description') }}</textarea>
-                </div>
-
-                <br>
-
-                <button type="submit">
-                    Simpan
-                </button>
-
-                <a href="{{ route('admin.categories.index') }}">
-                    Kembali
-                </a>
-
-            </form>
-
-        </div>
-
+    <div class="category-toolbar">
+        <a href="{{ route('admin.categories.index') }}" class="category-btn category-btn--ghost">
+            Kembali
+        </a>
     </div>
 
-</body>
-</html>
+    {{-- Pesan error global sudah ditampilkan otomatis oleh layout --}}
+
+    <form action="{{ route('admin.categories.store') }}"
+          method="POST"
+          class="category-card category-form">
+
+        @csrf
+
+        <div class="category-section">
+            <h2>Informasi kategori</h2>
+            <p>Nama kategori akan tampil di daftar produk dan kasir.</p>
+
+            <div class="category-grid">
+
+                <div class="category-field">
+                    <label for="name">Nama kategori <span class="req">*</span></label>
+                    <input type="text" id="name" name="name"
+                           value="{{ old('name') }}"
+                           class="@error('name') is-invalid @enderror"
+                           placeholder="Contoh: Makanan" required>
+                    @error('name') <span class="category-error">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="category-field">
+                    <label for="description">Deskripsi</label>
+                    <textarea id="description" name="description" rows="4"
+                              class="@error('description') is-invalid @enderror"
+                              placeholder="Deskripsi singkat kategori (boleh dikosongkan)">{{ old('description') }}</textarea>
+                    @error('description') <span class="category-error">{{ $message }}</span> @enderror
+                </div>
+
+            </div>
+        </div>
+
+        <div class="category-actions">
+            <a href="{{ route('admin.categories.index') }}" class="category-btn category-btn--ghost">Batal</a>
+            <button type="submit" class="category-btn">Simpan kategori</button>
+        </div>
+
+    </form>
+
+</div>
+@endsection

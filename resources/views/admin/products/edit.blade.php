@@ -1,287 +1,186 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('admin.layouts.app')
 
-    <title>Edit Produk</title>
+@section('title', 'Edit Produk')
+@section('page_title', 'Edit Produk')
+@section('page_subtitle', 'Perbarui informasi produk.')
 
-    @vite(['resources/css/admin/admin.css'])
-</head>
+@push('styles')
+    @vite('resources/css/admin/products.css')
+@endpush
 
-<body>
+@section('content')
+<div class="product-page">
 
-<div class="dashboard-container">
-
-    <div class="dashboard-header">
-
-        <div>
-            <h1>Edit Produk</h1>
-            <p>Perbarui informasi produk.</p>
-        </div>
-
-        <a
-            href="{{ route('admin.products.index') }}"
-            class="btn">
+    <div class="product-toolbar">
+        <a href="{{ route('admin.products.index') }}" class="product-btn product-btn--ghost">
             Kembali
         </a>
-
     </div>
 
-    @if($errors->any())
+    {{-- Pesan error global sudah ditampilkan otomatis oleh layout --}}
 
-        <div class="error-message">
+    <form action="{{ route('admin.products.update', $product) }}"
+          method="POST"
+          enctype="multipart/form-data"
+          class="product-card product-form">
 
-            <strong>Terjadi kesalahan:</strong>
+        @csrf
+        @method('PUT')
 
-            <ul>
+        {{-- ===== Informasi produk ===== --}}
+        <div class="product-section">
+            <h2>Informasi produk</h2>
+            <p>Data utama yang tampil di daftar produk dan kasir.</p>
 
-                @foreach($errors->all() as $error)
+            <div class="product-grid">
 
-                    <li>{{ $error }}</li>
+                <div class="product-field">
+                    <label for="code">Kode produk <span class="req">*</span></label>
+                    <input type="text" id="code" name="code"
+                           value="{{ old('code', $product->code) }}"
+                           class="@error('code') is-invalid @enderror" @readonly(true) required>
+                    @error('code') <span class="product-error">{{ $message }}</span> @enderror
+                </div>
 
-                @endforeach
+                <div class="product-field">
+                    <label for="name">Nama produk <span class="req">*</span></label>
+                    <input type="text" id="name" name="name"
+                           value="{{ old('name', $product->name) }}"
+                           class="@error('name') is-invalid @enderror" required>
+                    @error('name') <span class="product-error">{{ $message }}</span> @enderror
+                </div>
 
-            </ul>
+                <div class="product-field">
+                    <label for="category_id">Kategori <span class="req">*</span></label>
+                    <select id="category_id" name="category_id"
+                            class="@error('category_id') is-invalid @enderror" required>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}"
+                                {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('category_id') <span class="product-error">{{ $message }}</span> @enderror
+                </div>
 
+                <div class="product-field">
+                    <label for="unit">Satuan <span class="req">*</span></label>
+                    <select id="unit" name="unit"
+                            class="@error('unit') is-invalid @enderror" required>
+                        @foreach (['pcs', 'botol', 'kg', 'liter', 'pack'] as $unit)
+                            <option value="{{ $unit }}"
+                                {{ old('unit', $product->unit) == $unit ? 'selected' : '' }}>
+                                {{ $unit }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('unit') <span class="product-error">{{ $message }}</span> @enderror
+                </div>
+
+            </div>
         </div>
 
-    @endif
+        {{-- ===== Harga dan stok ===== --}}
+        <div class="product-section">
+            <h2>Harga dan stok</h2>
+            <p>Harga dalam rupiah, tanpa titik atau koma.</p>
 
-    <div class="dashboard-card">
+            <div class="product-grid">
 
-        <form
-            action="{{ route('admin.products.update', $product) }}"
-            method="POST"
-            enctype="multipart/form-data">
-
-            @csrf
-            @method('PUT')
-
-            <div class="form-group">
-
-                <label for="code">
-                    Kode Produk
-                </label>
-
-                <input
-                    type="text"
-                    id="code"
-                    name="code"
-                    value="{{ old('code', $product->code) }}"
-                    required>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="name">
-                    Nama Produk
-                </label>
-
-                <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value="{{ old('name', $product->name) }}"
-                    required>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="category_id">
-                    Kategori
-                </label>
-
-                <select
-                    id="category_id"
-                    name="category_id"
-                    required>
-
-                    @foreach($categories as $category)
-
-                        <option
-                            value="{{ $category->id }}"
-                            {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-
-                            {{ $category->name }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="purchase_price">
-                    Harga Beli
-                </label>
-
-                <input
-                    type="number"
-                    id="purchase_price"
-                    name="purchase_price"
-                    value="{{ old('purchase_price', $product->purchase_price) }}"
-                    min="0"
-                    required>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="selling_price">
-                    Harga Jual
-                </label>
-
-                <input
-                    type="number"
-                    id="selling_price"
-                    name="selling_price"
-                    value="{{ old('selling_price', $product->selling_price) }}"
-                    min="0"
-                    required>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="stock">
-                    Stok
-                </label>
-
-                <input
-                    type="number"
-                    id="stock"
-                    name="stock"
-                    value="{{ old('stock', $product->stock) }}"
-                    min="0"
-                    required>
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="unit">
-                    Satuan
-                </label>
-
-                <select
-                    id="unit"
-                    name="unit"
-                    required>
-
-                    @foreach(['pcs', 'botol', 'kg', 'liter', 'pack'] as $unit)
-
-                        <option
-                            value="{{ $unit }}"
-                            {{ old('unit', $product->unit) == $unit ? 'selected' : '' }}>
-
-                            {{ $unit }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Foto Saat Ini</label>
-
-                @if($product->photo)
-
-                    <div style="margin-bottom:10px;">
-
-                        <img
-                            src="{{ asset('storage/' . $product->photo) }}"
-                            alt="{{ $product->name }}"
-                            style="width:120px;height:120px;object-fit:cover;">
-
+                <div class="product-field">
+                    <label for="purchase_price">Harga beli <span class="req">*</span></label>
+                    <div class="product-input-group">
+                        <span>Rp</span>
+                        <input type="number" id="purchase_price" name="purchase_price"
+                               value="{{ old('purchase_price', $product->purchase_price) }}" min="0"
+                               class="@error('purchase_price') is-invalid @enderror" required>
                     </div>
+                    @error('purchase_price') <span class="product-error">{{ $message }}</span> @enderror
+                </div>
 
-                @else
+                <div class="product-field">
+                    <label for="selling_price">Harga jual <span class="req">*</span></label>
+                    <div class="product-input-group">
+                        <span>Rp</span>
+                        <input type="number" id="selling_price" name="selling_price"
+                               value="{{ old('selling_price', $product->selling_price) }}" min="0"
+                               class="@error('selling_price') is-invalid @enderror" required>
+                    </div>
+                    @error('selling_price') <span class="product-error">{{ $message }}</span> @enderror
+                </div>
 
-                    <p>Belum ada foto.</p>
+                <div class="product-field">
+                    <label for="stock">Stok <span class="req">*</span></label>
+                    <input type="number" id="stock" name="stock"
+                           value="{{ old('stock', $product->stock) }}" min="0"
+                           class="@error('stock') is-invalid @enderror" required>
+                    @error('stock') <span class="product-error">{{ $message }}</span> @enderror
+                </div>
 
-                @endif
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="photo">
-                    Ganti Foto
-                </label>
-
-                <input
-                    type="file"
-                    id="photo"
-                    name="photo"
-                    accept=".jpg,.jpeg,.png,.webp">
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="status">
-                    Status
-                </label>
-
-                <select
-                    id="status"
-                    name="status"
-                    required>
-
-                    <option
-                        value="active"
-                        {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>
-                        Aktif
-                    </option>
-
-                    <option
-                        value="inactive"
-                        {{ old('status', $product->status) == 'inactive' ? 'selected' : '' }}>
-                        Tidak Aktif
-                    </option>
-
-                </select>
+                <div class="product-field">
+                    <label for="status">Status produk <span class="req">*</span></label>
+                    <select id="status" name="status"
+                            class="@error('status') is-invalid @enderror" required>
+                        <option value="active"
+                            {{ old('status', $product->status) == 'active' ? 'selected' : '' }}>Aktif</option>
+                        <option value="inactive"
+                            {{ old('status', $product->status) == 'inactive' ? 'selected' : '' }}>Tidak aktif</option>
+                    </select>
+                    @error('status') <span class="product-error">{{ $message }}</span> @enderror
+                </div>
 
             </div>
+        </div>
 
-            <div class="form-group">
+        {{-- ===== Foto dan deskripsi ===== --}}
+        <div class="product-section">
+            <h2>Foto dan deskripsi</h2>
+            <p>Bagian ini boleh dikosongkan.</p>
 
-                <label for="description">
-                    Deskripsi
-                </label>
+            <div class="product-grid">
 
-                <textarea
-                    id="description"
-                    name="description"
-                    rows="5">{{ old('description', $product->description) }}</textarea>
+                <div class="product-field is-full">
+                    <label>Foto saat ini</label>
+
+                    @if ($product->photo)
+                        <img src="{{ asset('storage/' . $product->photo) }}"
+                             alt="{{ $product->name }}"
+                             class="product-photo">
+                    @else
+                        <span class="product-hint">Belum ada foto.</span>
+                    @endif
+                </div>
+
+                <div class="product-field is-full">
+                    <label for="photo">Ganti foto</label>
+                    <input type="file" id="photo" name="photo"
+                           class="@error('photo') is-invalid @enderror"
+                           accept=".jpg,.jpeg,.png,.webp">
+                    <span class="product-hint">
+                        Kosongkan jika tidak ingin mengganti. Format JPG, JPEG, PNG, atau WEBP, maksimal 2 MB.
+                    </span>
+                    @error('photo') <span class="product-error">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="product-field is-full">
+                    <label for="description">Deskripsi</label>
+                    <textarea id="description" name="description" rows="5"
+                              class="@error('description') is-invalid @enderror"
+                              placeholder="Masukkan deskripsi produk">{{ old('description', $product->description) }}</textarea>
+                    @error('description') <span class="product-error">{{ $message }}</span> @enderror
+                </div>
 
             </div>
+        </div>
 
-            <button type="submit">
-                Simpan Perubahan
-            </button>
+        {{-- ===== Tombol ===== --}}
+        <div class="product-actions">
+            <a href="{{ route('admin.products.index') }}" class="product-btn product-btn--ghost">Batal</a>
+            <button type="submit" class="product-btn">Simpan perubahan</button>
+        </div>
 
-            <a
-                href="{{ route('admin.products.index') }}"
-                class="btn">
-                Batal
-            </a>
-
-        </form>
-
-    </div>
+    </form>
 
 </div>
-
-</body>
-</html>
+@endsection

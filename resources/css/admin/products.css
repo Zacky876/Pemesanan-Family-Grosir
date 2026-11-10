@@ -1,0 +1,459 @@
+.product-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* jarak otomatis antar blok: toolbar, filter, tabel, form */
+    width: 100%;
+}
+
+.product-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.product-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: var(--blue-600);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s;
+}
+
+.product-btn:hover {
+    background: var(--blue-900);
+}
+
+.product-btn--ghost {
+    background: var(--surface);
+    border-color: var(--line);
+    color: var(--text);
+}
+
+.product-btn--ghost:hover {
+    background: var(--blue-50);
+    border-color: var(--blue-600);
+}
+
+.product-btn--danger {
+    background: var(--red);
+}
+
+.product-btn--danger:hover {
+    background: var(--red-dark);
+}
+
+.product-btn--small {
+    padding: 6px 12px;
+    font-size: 13.5px;
+}
+
+/* ---------- Kartu & bagian form ---------- */
+
+.product-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.product-form {
+    padding: 0;
+    overflow: hidden;
+}
+
+.product-section {
+    padding: 24px 26px;
+    border-bottom: 1px solid var(--line);
+}
+
+.product-section h2 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.product-section > p {
+    margin: 0 0 18px;
+    color: var(--muted);
+    font-size: 13.5px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 20px;
+}
+
+.product-field {
+    min-width: 0;
+}
+
+.product-field.is-full {
+    grid-column: 1 / -1;
+}
+
+.product-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.product-field label .req {
+    color: var(--red);
+}
+
+/* ---------- Input ---------- */
+
+.product-field input,
+.product-field select,
+.product-field textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.product-field textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.product-field input:focus,
+.product-field select:focus,
+.product-field textarea:focus {
+    outline: none;
+    border-color: var(--blue-600);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.product-field input::placeholder,
+.product-field textarea::placeholder {
+    color: #93a1bd;
+}
+
+.product-field .is-invalid {
+    border-color: var(--red);
+}
+
+.product-field .is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.product-hint {
+    display: block;
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.product-error {
+    display: block;
+    margin-top: 5px;
+    color: var(--red-dark);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Input dengan awalan "Rp" */
+.product-input-group {
+    display: flex;
+}
+
+.product-input-group > span {
+    display: grid;
+    place-items: center;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-right: 0;
+    border-radius: 10px 0 0 10px;
+    background: var(--blue-50);
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.product-input-group > input {
+    border-radius: 0 10px 10px 0;
+}
+
+/* Input file */
+.product-field input[type="file"] {
+    padding: 8px;
+    background: var(--blue-50);
+    border-style: dashed;
+    cursor: pointer;
+}
+
+.product-field input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 7px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--blue-600);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.product-field input[type="file"]::file-selector-button:hover {
+    background: var(--blue-900);
+}
+
+/* ---------- Foto produk saat ini (edit / show) ---------- */
+
+.product-photo {
+    display: block;
+    width: 140px;
+    height: 140px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    object-fit: cover;
+    background: var(--blue-100);
+}
+
+/* ---------- Tombol aksi form ---------- */
+
+.product-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 18px 26px;
+    background: var(--blue-50);
+}
+
+/* ---------- Tabel produk (index) ---------- */
+
+.product-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.product-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+}
+
+.product-table th,
+.product-table td {
+    padding: 13px 16px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--line);
+}
+
+.product-table th {
+    background: var(--blue-50);
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.product-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.product-table tbody tr:hover {
+    background: #f7faff;
+}
+
+.product-thumb {
+    display: block;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: var(--blue-100);
+}
+
+.product-row-actions {
+    display: flex;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.product-row-actions form {
+    margin: 0;
+}
+
+.product-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--muted);
+}
+
+/* ---------- Lencana status ---------- */
+
+.product-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.product-badge--active {
+    background: var(--green-soft);
+    color: var(--green);
+}
+
+.product-badge--inactive {
+    background: var(--red-soft);
+    color: var(--red-dark);
+}
+
+.product-badge--low {
+    background: var(--yellow-soft);
+    color: var(--yellow);
+}
+
+/* ---------- Cari & filter (index) ---------- */
+
+.product-filter {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr auto;
+    gap: 16px 20px;
+    align-items: end;
+    padding: 22px 24px;
+}
+
+.product-filter-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.product-filter .product-btn {
+    padding-top: 11px;
+    padding-bottom: 11px;
+}
+
+/* ---------- Detail produk (show) ---------- */
+
+.product-detail {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    padding: 26px;
+    align-items: start;
+}
+
+.product-photo--large {
+    width: 220px;
+    height: 220px;
+}
+
+.product-photo-empty {
+    display: grid;
+    place-items: center;
+    width: 220px;
+    height: 220px;
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    background: var(--blue-50);
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.product-dl {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    margin: 0;
+}
+
+.product-dl dt,
+.product-dl dd {
+    margin: 0;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.product-dl dt {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.product-dl dt:last-of-type,
+.product-dl dd:last-of-type {
+    border-bottom: 0;
+}
+
+/* ---------- Responsif ---------- */
+
+@media (max-width: 720px) {
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .product-filter {
+        grid-template-columns: 1fr;
+        padding: 18px;
+    }
+
+    .product-filter-actions .product-btn {
+        flex: 1;
+    }
+
+    .product-detail {
+        grid-template-columns: 1fr;
+        padding: 20px 18px;
+        gap: 20px;
+    }
+
+    .product-photo--large,
+    .product-photo-empty {
+        width: 100%;
+        max-width: 280px;
+        height: auto;
+        aspect-ratio: 1;
+    }
+
+    .product-dl {
+        grid-template-columns: 1fr;
+    }
+
+    .product-dl dt {
+        padding-bottom: 0;
+        border-bottom: 0;
+    }
+
+    .product-dl dd {
+        padding-top: 2px;
+    }
+
+    .product-section {
+        padding: 20px 18px;
+    }
+
+    .product-actions {
+        flex-direction: column-reverse;
+        padding: 16px 18px;
+    }
+
+    .product-actions .product-btn,
+    .product-toolbar .product-btn {
+        width: 100%;
+    }
+}

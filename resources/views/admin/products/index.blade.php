@@ -1,256 +1,145 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('admin.layouts.app')
 
-    <title>Data Produk</title>
+@section('title', 'Data Produk')
+@section('page_title', 'Data Produk')
+@section('page_subtitle', 'Kelola produk minimarket.')
 
-    @vite(['resources/css/admin/admin.css'])
-</head>
+@push('styles')
+    @vite('resources/css/admin/products.css')
+@endpush
 
-<body>
+@section('content')
+<div class="product-page">
 
-<div class="dashboard-container">
+    {{-- Pesan sukses/error ditampilkan otomatis oleh layout --}}
 
-    <div class="dashboard-header">
+    <div class="product-toolbar">
+        <span class="product-hint" style="margin:0;">
+            {{ $products->count() }} produk ditampilkan
+        </span>
 
-        <div>
-            <h1>Data Produk</h1>
-            <p>Kelola produk minimarket.</p>
-        </div>
-
-        <div>
-
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="btn">
-                Dashboard
-            </a>
-
-            <a
-                href="{{ route('admin.products.create') }}"
-                class="btn">
-                + Tambah Produk
-            </a>
-
-        </div>
-
+        <a href="{{ route('admin.products.create') }}" class="product-btn">
+            + Tambah produk
+        </a>
     </div>
 
-    @if(session('success'))
+    {{-- ===== Cari dan filter ===== --}}
+    <form action="{{ route('admin.products.index') }}" method="GET"
+          class="product-card product-filter">
 
-        <div class="success-message">
-            {{ session('success') }}
+        <div class="product-field">
+            <label for="search">Cari produk</label>
+            <input type="text" id="search" name="search"
+                   value="{{ request('search') }}"
+                   placeholder="Cari nama atau kode produk">
         </div>
 
-    @endif
-
-    {{-- Search dan Filter --}}
-
-    <div class="dashboard-card" style="margin-bottom: 20px;">
-
-        <form
-            action="{{ route('admin.products.index') }}"
-            method="GET">
-
-            <div class="form-group">
-
-                <label for="search">
-                    Cari Produk
-                </label>
-
-                <input
-                    type="text"
-                    id="search"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Cari nama atau kode produk">
-
-            </div>
-
-            <div class="form-group">
-
-                <label for="category_id">
-                    Filter Kategori
-                </label>
-
-                <select
-                    id="category_id"
-                    name="category_id">
-
-                    <option value="">
-                        Semua Kategori
+        <div class="product-field">
+            <label for="category_id">Kategori</label>
+            <select id="category_id" name="category_id">
+                <option value="">Semua kategori</option>
+                @foreach ($categories as $category)
+                    <option value="{{ $category->id }}"
+                        {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                        {{ $category->name }}
                     </option>
+                @endforeach
+            </select>
+        </div>
 
-                    @foreach($categories as $category)
+        <div class="product-filter-actions">
+            <button type="submit" class="product-btn">Cari</button>
+            <a href="{{ route('admin.products.index') }}" class="product-btn product-btn--ghost">Reset</a>
+        </div>
 
-                        <option
-                            value="{{ $category->id }}"
-                            {{ request('category_id') == $category->id ? 'selected' : '' }}>
+    </form>
 
-                            {{ $category->name }}
+    {{-- ===== Data produk ===== --}}
+    @if ($products->count() > 0)
 
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            <button type="submit">
-                Cari
-            </button>
-
-            <a
-                href="{{ route('admin.products.index') }}"
-                class="btn">
-                Reset
-            </a>
-
-        </form>
-
-    </div>
-
-    {{-- Data Produk --}}
-
-    <div class="dashboard-card">
-
-        @if($products->count() > 0)
-
-            <table>
+        <div class="product-table-wrap">
+            <table class="product-table">
 
                 <thead>
-
                     <tr>
                         <th>No</th>
                         <th>Foto</th>
                         <th>Kode</th>
                         <th>Nama</th>
                         <th>Kategori</th>
-                        <th>Harga Beli</th>
-                        <th>Harga Jual</th>
+                        <th>Harga beli</th>
+                        <th>Harga jual</th>
                         <th>Stok</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
-
                 </thead>
 
                 <tbody>
-
-                    @foreach($products as $product)
-
+                    @foreach ($products as $product)
                         <tr>
+                            <td>{{ $loop->iteration }}</td>
 
                             <td>
-                                {{ $loop->iteration }}
-                            </td>
-
-                            <td>
-
-                                @if($product->photo)
-
-                                    <img
-                                        src="{{ asset('storage/' . $product->photo) }}"
-                                        alt="{{ $product->name }}"
-                                        style="width:60px;height:60px;object-fit:cover;">
-
+                                @if ($product->photo)
+                                    <img src="{{ asset('storage/' . $product->photo) }}"
+                                         alt="{{ $product->name }}"
+                                         class="product-thumb">
                                 @else
-
-                                    Tidak ada
-
+                                    <span class="product-hint" style="margin:0;">Tidak ada</span>
                                 @endif
+                            </td>
 
+                            <td>{{ $product->code }}</td>
+                            <td><strong>{{ $product->name }}</strong></td>
+                            <td>{{ $product->category->name ?? '-' }}</td>
+                            <td>Rp {{ number_format($product->purchase_price, 0, ',', '.') }}</td>
+                            <td>Rp {{ number_format($product->selling_price, 0, ',', '.') }}</td>
+                            <td>{{ $product->stock }} {{ $product->unit }}</td>
+
+                            <td>
+                                @if ($product->status == 'active')
+                                    <span class="product-badge product-badge--active">Aktif</span>
+                                @else
+                                    <span class="product-badge product-badge--inactive">Tidak aktif</span>
+                                @endif
                             </td>
 
                             <td>
-                                {{ $product->code }}
+                                <div class="product-row-actions">
+                                    <a href="{{ route('admin.products.show', $product) }}"
+                                       class="product-btn product-btn--ghost product-btn--small">Detail</a>
+
+                                    <a href="{{ route('admin.products.edit', $product) }}"
+                                       class="product-btn product-btn--ghost product-btn--small">Edit</a>
+
+                                    <form action="{{ route('admin.products.destroy', $product) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit"
+                                                class="product-btn product-btn--danger product-btn--small"
+                                                onclick="return confirm('Yakin ingin menghapus produk ini?')">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
-
-                            <td>
-                                {{ $product->name }}
-                            </td>
-
-                            <td>
-                                {{ $product->category->name }}
-                            </td>
-
-                            <td>
-                                Rp {{ number_format($product->purchase_price, 0, ',', '.') }}
-                            </td>
-
-                            <td>
-                                Rp {{ number_format($product->selling_price, 0, ',', '.') }}
-                            </td>
-
-                            <td>
-                                {{ $product->stock }}
-                                {{ $product->unit }}
-                            </td>
-
-                            <td>
-                                {{ $product->status == 'active' ? 'Aktif' : 'Tidak Aktif' }}
-                            </td>
-
-                            <td>
-
-                                <a
-                                    href="{{ route('admin.products.show', $product) }}"
-                                    class="btn">
-                                    Detail
-                                </a>
-
-                                <a
-                                    href="{{ route('admin.products.edit', $product) }}"
-                                    class="btn">
-                                    Edit
-                                </a>
-
-                                <form
-                                    action="{{ route('admin.products.destroy', $product) }}"
-                                    method="POST"
-                                    style="display:inline;">
-
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button
-                                        type="submit"
-                                        onclick="return confirm('Yakin ingin menghapus produk ini?')">
-                                        Hapus
-                                    </button>
-
-                                </form>
-
-                            </td>
-
                         </tr>
-
                     @endforeach
-
                 </tbody>
 
             </table>
+        </div>
 
-        @else
+    @else
 
-            <p>
-                Tidak ada produk yang ditemukan.
-            </p>
+        <div class="product-card product-empty">
+            <p style="margin:0 0 14px;">Tidak ada produk yang ditemukan.</p>
+            <a href="{{ route('admin.products.create') }}" class="product-btn">Tambah produk</a>
+        </div>
 
-            <a
-                href="{{ route('admin.products.create') }}"
-                class="btn">
-                Tambah Produk
-            </a>
-
-        @endif
-
-    </div>
+    @endif
 
 </div>
-
-</body>
-</html>
+@endsection

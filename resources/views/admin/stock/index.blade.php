@@ -1,63 +1,39 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('admin.layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Manajemen Stok')
+@section('page_title', 'Manajemen Stok')
+@section('page_subtitle', 'Kelola stok produk minimarket.')
 
-    <title>Manajemen Stok</title>
+@push('styles')
+    @vite('resources/css/admin/stock.css')
+@endpush
 
-    @vite(['resources/css/admin/admin.css'])
-</head>
+@section('content')
+@php
+    $lowStockProducts = $products->filter(fn ($product) => $product->stock <= $product->minimum_stock);
+@endphp
 
-<body>
+<div class="stock-page">
 
-<div class="dashboard-container">
+    {{-- Pesan sukses/error ditampilkan otomatis oleh layout --}}
 
-    <div class="dashboard-header">
+    <div class="stock-toolbar">
+        <span class="stock-hint" style="margin:0;">
+            {{ $products->count() }} produk
+        </span>
 
-        <div>
-            <h1>Manajemen Stok</h1>
-            <p>Kelola stok produk minimarket.</p>
-        </div>
-
-        <div>
-            <a
-                href="{{ route('admin.dashboard') }}"
-                class="btn">
-                Dashboard
-            </a>
-
-            <a
-                href="{{ route('admin.products.index') }}"
-                class="btn">
-                Produk
-            </a>
-        </div>
-
+        <a href="{{ route('admin.products.index') }}" class="stock-btn stock-btn--ghost">
+            Kelola produk
+        </a>
     </div>
 
-    @if(session('success'))
-
-        <div class="success-message">
-            {{ session('success') }}
-        </div>
-
-    @endif
-
-    @php
-        $lowStockProducts = $products->filter(fn ($product) => $product->stock <= $product->minimum_stock);
-    @endphp
-
-    @if($lowStockProducts->isNotEmpty())
-        <div class="success-message"
-            style="background: #fff3cd; color: #856404; margin-bottom: 16px;">
-            <strong>Perhatian!</strong>
-            Ada {{ $lowStockProducts->count() }}
-            produk dengan stok hampir habis.
+    {{-- ===== Peringatan stok menipis ===== --}}
+    @if ($lowStockProducts->isNotEmpty())
+        <div class="stock-alert" role="alert">
+            <strong>Perhatian! Ada {{ $lowStockProducts->count() }} produk dengan stok hampir habis.</strong>
 
             <ul>
-                @foreach($lowStockProducts as $product)
+                @foreach ($lowStockProducts as $product)
                     <li>
                         {{ $product->name }}:
                         stok {{ $product->stock }},
@@ -68,9 +44,10 @@
         </div>
     @endif
 
-    <div class="dashboard-card">
+    {{-- ===== Tabel stok ===== --}}
+    <div class="stock-table-wrap">
+        <table class="stock-table stock-table--wide">
 
-        <table>
             <thead>
                 <tr>
                     <th>No</th>
@@ -78,68 +55,62 @@
                     <th>Produk</th>
                     <th>Kategori</th>
                     <th>Stok</th>
-                    <th>Stok Minimum</th>
+                    <th>Stok minimum</th>
                     <th>Satuan</th>
-                    <th>Status Stok</th>
-                    <th>Status Produk</th>
+                    <th>Status stok</th>
+                    <th>Status produk</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
 
             <tbody>
-                @forelse($products as $product)
-                    <tr>
+                @forelse ($products as $product)
+                    @php $isLow = $product->stock <= $product->minimum_stock; @endphp
+
+                    <tr class="{{ $isLow ? 'is-low' : '' }}">
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $product->code }}</td>
-                        <td>{{ $product->name }}</td>
+                        <td><strong>{{ $product->name }}</strong></td>
                         <td>{{ $product->category->name ?? '-' }}</td>
-                        <td>{{ $product->stock }}</td>
+                        <td><strong>{{ $product->stock }}</strong></td>
                         <td>{{ $product->minimum_stock }}</td>
-
                         <td>{{ $product->unit }}</td>
 
                         <td>
-                            @if($product->stock <= $product->minimum_stock)
-                                <strong style="color: #c62828;">
-                                    Stok Hampir Habis
-                                </strong>
+                            @if ($isLow)
+                                <span class="stock-badge stock-badge--danger">Hampir habis</span>
                             @else
-                                <span style="color: #2e7d32;">
-                                    Stok Aman
-                                </span>
+                                <span class="stock-badge stock-badge--safe">Aman</span>
                             @endif
                         </td>
 
                         <td>
-                            {{ $product->status == 'active' ? 'Aktif' : 'Tidak Aktif' }}
+                            @if ($product->status == 'active')
+                                <span class="stock-badge stock-badge--safe">Aktif</span>
+                            @else
+                                <span class="stock-badge stock-badge--muted">Tidak aktif</span>
+                            @endif
                         </td>
 
                         <td>
-                            <a
-                                href="{{ route('admin.stock.create', $product) }}"
-                                class="btn">
-                                Ubah Stok
-                            </a>
+                            <div class="stock-row-actions">
+                                <a href="{{ route('admin.stock.create', $product) }}"
+                                   class="stock-btn stock-btn--small">Ubah stok</a>
 
-                            <a
-                                href="{{ route('admin.stock.history', $product) }}"
-                                class="btn">
-                                Riwayat
-                            </a>
+                                <a href="{{ route('admin.stock.history', $product) }}"
+                                   class="stock-btn stock-btn--ghost stock-btn--small">Riwayat</a>
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="10">Belum ada produk.</td>
+                        <td colspan="10" class="stock-empty">Belum ada produk.</td>
                     </tr>
                 @endforelse
             </tbody>
-        </table>
 
+        </table>
     </div>
 
 </div>
-
-</body>
-
-</html>
+@endsection

@@ -1,94 +1,83 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('admin.layouts.app')
 
-    <title>Kategori - Admin</title>
+@section('title', 'Kategori')
+@section('page_title', 'Kategori Produk')
+@section('page_subtitle', 'Kelola kategori produk minimarket.')
 
-    @vite(['resources/css/admin/admin.css'])
-</head>
+@push('styles')
+    @vite('resources/css/admin/categories.css')
+@endpush
 
-<body>
+@section('content')
+<div class="category-page">
 
-    <div class="dashboard-container">
+    {{-- Pesan sukses/error ditampilkan otomatis oleh layout --}}
 
-        <div class="dashboard-header">
-            <div>
-                <h1>Kategori Produk</h1>
-                <p>Kelola kategori produk minimarket.</p>
-            </div>
+    <div class="category-toolbar">
+        <span class="category-hint" style="margin:0;">
+            {{ $categories->count() }} kategori
+        </span>
 
-            <a href="{{ route('admin.categories.create') }}">
-                + Tambah Kategori
-            </a>
-        </div>
+        <a href="{{ route('admin.categories.create') }}" class="category-btn">
+            + Tambah kategori
+        </a>
+    </div>
 
-        @if(session('success'))
-            <div class="success-message">
-                {{ session('success') }}
-            </div>
-        @endif
+    @if ($categories->count() > 0)
 
-        <div class="dashboard-card">
+        <div class="category-table-wrap">
+            <table class="category-table">
 
-            @if($categories->count() > 0)
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama kategori</th>
+                        <th>Deskripsi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
 
-                <table>
-                    <thead>
+                <tbody>
+                    @foreach ($categories as $category)
                         <tr>
-                            <th>No</th>
-                            <th>Nama Kategori</th>
-                            <th>Deskripsi</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
+                            <td>{{ $loop->iteration }}</td>
 
-                    <tbody>
-                        @foreach($categories as $category)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
+                            <td><strong>{{ $category->name }}</strong></td>
 
-                                <td>
-                                    {{ $category->name }}
-                                </td>
+                            <td>{{ $category->description ?: '-' }}</td>
 
-                                <td>
-                                    {{ $category->description ?? '-' }}
-                                </td>
+                            <td>
+                                <div class="category-row-actions">
+                                    <a href="{{ route('admin.categories.edit', $category) }}"
+                                       class="category-btn category-btn--ghost category-btn--small">Edit</a>
 
-                                <td>
-                                    <a href="{{ route('admin.categories.edit', $category) }}">
-                                        Edit
-                                    </a>
-
-                                    <form
-                                        action="{{ route('admin.categories.destroy', $category) }}"
-                                        method="POST"
-                                        style="display: inline;"
-                                    >
+                                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
 
-                                        <button type="submit">
+                                        <button type="submit"
+                                                class="category-btn category-btn--danger category-btn--small"
+                                                onclick="return confirm('Yakin ingin menghapus kategori ini?')">
                                             Hapus
                                         </button>
                                     </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
 
-            @else
-
-                <p>Belum ada kategori.</p>
-
-            @endif
-
+            </table>
         </div>
 
-    </div>
+    @else
 
-</body>
-</html>
+        <div class="category-card category-empty">
+            <p style="margin:0 0 14px;">Belum ada kategori.</p>
+            <a href="{{ route('admin.categories.create') }}" class="category-btn">Tambah kategori</a>
+        </div>
+
+    @endif
+
+</div>
+@endsection
