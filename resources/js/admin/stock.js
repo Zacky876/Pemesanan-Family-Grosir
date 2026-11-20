@@ -1,40 +1,43 @@
-const form = document.getElementById('stockForm');
+// Menghitung "Stok setelah perubahan" secara langsung di halaman Ubah Stok.
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('stockForm');
+    if (!form) return;
 
-if (form) {
     const current = Number(form.dataset.current) || 0;
     const unit = form.dataset.unit || '';
-
-    const type = document.getElementById('type');
-    const qty = document.getElementById('quantity');
-    const hint = document.getElementById('quantityHint');
-    const after = document.getElementById('stockAfter');
+    const typeEl = document.getElementById('type');
+    const qtyEl = document.getElementById('quantity');
+    const afterEl = document.getElementById('stockAfter');
+    const hintEl = document.getElementById('quantityHint');
 
     const hints = {
-        in: 'Isi jumlah stok yang masuk.',
-        out: 'Isi jumlah stok yang keluar.',
-        adjustment: 'Isi jumlah stok fisik terbaru hasil perhitungan.',
+        in: 'Isi jumlah barang yang masuk. Stok akan bertambah.',
+        out: 'Isi jumlah barang yang keluar. Stok akan berkurang.',
+        adjustment: 'Isi jumlah stok fisik terbaru hasil stok opname.',
     };
 
     function update() {
-        if (hint) hint.textContent = hints[type.value] || '';
+        const type = typeEl.value;
+        const qty = Number(qtyEl.value);
 
-        const q = parseInt(qty.value, 10);
+        if (hintEl) hintEl.textContent = hints[type] || '';
 
-        if (Number.isNaN(q)) {
-            after.textContent = '-';
-            after.classList.remove('is-negative');
+        if (qtyEl.value === '' || Number.isNaN(qty)) {
+            afterEl.textContent = '-';
+            afterEl.classList.remove('is-negative');
             return;
         }
 
-        let result = q;
-        if (type.value === 'in') result = current + q;
-        if (type.value === 'out') result = current - q;
+        let after = current;
+        if (type === 'in') after = current + qty;
+        if (type === 'out') after = current - qty;
+        if (type === 'adjustment') after = qty;
 
-        after.textContent = `${result} ${unit}`;
-        after.classList.toggle('is-negative', result < 0);
+        afterEl.textContent = `${after} ${unit}`;
+        afterEl.classList.toggle('is-negative', after < 0);
     }
 
-    type.addEventListener('change', update);
-    qty.addEventListener('input', update);
+    typeEl.addEventListener('change', update);
+    qtyEl.addEventListener('input', update);
     update();
-}
+});

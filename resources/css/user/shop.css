@@ -1,0 +1,354 @@
+/* Keranjang dan checkout pelanggan - memakai variabel --u-* dari layout.css */
+
+.shop-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: var(--u-text);
+}
+
+.shop-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.shop-hint {
+    color: var(--u-muted);
+    font-size: 13.5px;
+}
+
+/* ---------- Tombol ---------- */
+
+.shop-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4a6bff, var(--u-blue));
+    box-shadow: 0 10px 20px -10px rgba(35, 71, 255, 0.7);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.shop-btn:hover {
+    background: linear-gradient(135deg, var(--u-blue), var(--u-blue-dark));
+}
+
+.shop-btn:focus-visible {
+    outline: 3px solid rgba(35, 71, 255, 0.35);
+    outline-offset: 2px;
+}
+
+.shop-btn--ghost {
+    background: var(--u-surface);
+    border-color: var(--u-line);
+    box-shadow: none;
+    color: var(--u-navy);
+}
+
+.shop-btn--ghost:hover {
+    background: var(--u-blue-50);
+    border-color: var(--u-blue);
+    color: var(--u-blue);
+}
+
+.shop-btn--danger {
+    background: var(--u-surface);
+    border-color: #ffc7ca;
+    box-shadow: none;
+    color: var(--u-red-dark);
+}
+
+.shop-btn--danger:hover {
+    background: var(--u-red-soft);
+    border-color: var(--u-red);
+    color: var(--u-red-dark);
+}
+
+.shop-btn--small {
+    padding: 7px 14px;
+    border-radius: 10px;
+    box-shadow: none;
+    font-size: 13.5px;
+}
+
+.shop-btn--block {
+    width: 100%;
+    padding: 13px 20px;
+    font-size: 15.5px;
+}
+
+/* ---------- Susunan halaman ---------- */
+
+.shop-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 20px;
+    align-items: start;
+}
+
+.shop-card {
+    border: 1px solid var(--u-line);
+    border-radius: var(--u-radius);
+    background: var(--u-surface);
+    box-shadow: var(--u-shadow);
+}
+
+.shop-section {
+    padding: 24px 26px;
+}
+
+.shop-section h2 {
+    margin: 0 0 4px;
+    color: var(--u-navy);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.shop-section > p {
+    margin: 0 0 16px;
+    color: var(--u-muted);
+    font-size: 13.5px;
+}
+
+/* ---------- Tabel ---------- */
+
+.shop-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--u-line);
+    border-radius: var(--u-radius);
+    background: var(--u-surface);
+    box-shadow: var(--u-shadow);
+}
+
+.shop-table {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+}
+
+.shop-table th,
+.shop-table td {
+    padding: 14px 18px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--u-line);
+}
+
+.shop-table th {
+    background: var(--u-blue-50);
+    color: var(--u-navy);
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.shop-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.shop-table tbody tr:hover {
+    background: #f6f9ff;
+}
+
+.shop-table tfoot td {
+    border-top: 2px solid var(--u-line);
+    border-bottom: 0;
+    background: var(--u-blue-50);
+    color: var(--u-navy-deep);
+    font-weight: 800;
+}
+
+.shop-table .is-num {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.shop-product {
+    color: var(--u-navy-deep);
+    font-weight: 700;
+}
+
+.shop-qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.shop-qty input {
+    width: 78px;
+    padding: 8px 10px;
+    border: 1px solid var(--u-line);
+    border-radius: 10px;
+    background: var(--u-surface);
+    color: var(--u-text);
+    font: inherit;
+    font-size: 14px;
+}
+
+.shop-qty input:focus {
+    outline: none;
+    border-color: var(--u-blue);
+    box-shadow: 0 0 0 4px rgba(35, 71, 255, 0.14);
+}
+
+.shop-table form {
+    margin: 0;
+}
+
+/* ---------- Ringkasan ---------- */
+
+.shop-summary {
+    position: sticky;
+    top: 20px;
+    padding: 24px 26px;
+    overflow: hidden;
+    border-radius: var(--u-radius);
+    color: #fff;
+    background:
+        radial-gradient(circle at 95% 0%, rgba(90, 140, 255, 0.55), transparent 55%),
+        linear-gradient(120deg, #071a4d, #0c2a7a 55%, #1b45c9);
+    box-shadow: 0 24px 48px -24px rgba(12, 42, 122, 0.7);
+}
+
+.shop-summary h2 {
+    margin: 0 0 6px;
+    color: #c3d4ff;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.shop-total {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+}
+
+.shop-summary p {
+    margin: 0 0 20px;
+    color: #c3d4ff;
+    font-size: 13.5px;
+}
+
+.shop-summary .shop-btn {
+    background: linear-gradient(135deg, #ffa35c, var(--u-orange));
+    box-shadow: 0 14px 26px -12px rgba(255, 122, 47, 0.8);
+}
+
+.shop-summary .shop-btn:hover {
+    filter: brightness(0.95);
+}
+
+/* ---------- Metode pembayaran ---------- */
+
+.shop-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.shop-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--u-line);
+    border-radius: 14px;
+    background: var(--u-surface);
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+}
+
+.shop-option:hover {
+    border-color: #b9c8ff;
+}
+
+.shop-option input {
+    margin-top: 4px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--u-blue);
+    flex-shrink: 0;
+}
+
+.shop-option:has(input:checked) {
+    border-color: var(--u-blue);
+    background: var(--u-blue-50);
+    box-shadow: 0 0 0 4px rgba(35, 71, 255, 0.1);
+}
+
+.shop-option strong {
+    display: block;
+    color: var(--u-navy-deep);
+    font-size: 15px;
+}
+
+.shop-option span {
+    display: block;
+    margin-top: 2px;
+    color: var(--u-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.shop-status {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--u-amber-soft);
+    color: var(--u-amber-dark);
+    font-size: 13.5px;
+}
+
+.shop-empty {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--u-muted);
+}
+
+.shop-empty p {
+    margin-bottom: 16px;
+    font-size: 15.5px;
+}
+
+/* ---------- Responsif ---------- */
+
+@media (max-width: 1100px) {
+    .shop-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .shop-summary {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .shop-toolbar .shop-btn {
+        width: 100%;
+    }
+
+    .shop-section {
+        padding: 20px 18px;
+    }
+}

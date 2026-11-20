@@ -1,83 +1,74 @@
+@extends('admin.layouts.app')
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Pelanggan</title>
+@section('title', 'Edit Pelanggan')
+@section('page_title', 'Edit Pelanggan')
+@section('page_subtitle', 'Perbarui data akun pelanggan.')
 
-    @vite(['resources/css/admin/admin.css'])
-</head>
-<body>
-    <div class="dashboard-container">
-        <div class="dashboard-header">
-            <h1>Edit Pelanggan</h1>
+@push('styles')
+    @vite('resources/css/admin/customers.css')
+@endpush
 
-            <a href="{{ route('admin.customers.index') }}" class="btn">
-                Kembali
-            </a>
-        </div>
+@section('content')
+<div class="customer-page">
 
-        <div class="dashboard-card">
-            @if ($errors->any())
-                <div class="error-message">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form
-                action="{{ route('admin.customers.update', $customer) }}"
-                method="POST"
-            >
-                @csrf
-                @method('PUT')
-
-                <div class="form-group">
-                    <label for="name">Nama Pelanggan</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value="{{ old('name', $customer->name) }}"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value="{{ old('email', $customer->email) }}"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password Baru</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                    >
-                    <small>
-                        Kosongkan jika tidak ingin mengganti password.
-                        Minimal 8 karakter jika diisi.
-                    </small>
-                </div>
-
-                <button type="submit">Simpan Perubahan</button>
-
-                <a href="{{ route('admin.customers.index') }}" class="btn">
-                    Batal
-                </a>
-            </form>
-        </div>
+    <div class="customer-toolbar">
+        <a href="{{ route('admin.customers.index') }}" class="customer-btn customer-btn--ghost">
+            Kembali
+        </a>
     </div>
-</body>
-</html>
+
+    {{-- Pesan error global sudah ditampilkan otomatis oleh layout --}}
+
+    <form action="{{ route('admin.customers.update', $customer) }}"
+          method="POST"
+          class="customer-card customer-form">
+
+        @csrf
+        @method('PUT')
+
+        <div class="customer-section">
+            <h2>Informasi pelanggan</h2>
+            <p>Ubah nama atau email pelanggan. Password hanya diganti jika kolomnya diisi.</p>
+
+            <div class="customer-grid">
+
+                <div class="customer-field">
+                    <label for="name">Nama pelanggan <span class="req">*</span></label>
+                    <input type="text" id="name" name="name"
+                           value="{{ old('name', $customer->name) }}"
+                           class="@error('name') is-invalid @enderror"
+                           placeholder="Contoh: Budi Santoso" required>
+                    @error('name') <span class="customer-error">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="customer-field">
+                    <label for="email">Email <span class="req">*</span></label>
+                    <input type="email" id="email" name="email"
+                           value="{{ old('email', $customer->email) }}"
+                           class="@error('email') is-invalid @enderror"
+                           placeholder="contoh@email.com" required>
+                    @error('email') <span class="customer-error">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="customer-field customer-field--full">
+                    <label for="password">Password baru</label>
+                    <input type="password" id="password" name="password"
+                           class="@error('password') is-invalid @enderror"
+                           placeholder="Kosongkan jika tidak ingin mengganti"
+                           autocomplete="new-password">
+                    <span class="customer-hint">Minimal 8 karakter jika diisi.</span>
+                    @error('password') <span class="customer-error">{{ $message }}</span> @enderror
+                </div>
+
+            </div>
+        </div>
+
+        <div class="customer-actions">
+            <a href="{{ route('admin.customers.index') }}" class="customer-btn customer-btn--ghost">Batal</a>
+            <button type="submit" class="customer-btn">Simpan perubahan</button>
+        </div>
+
+    </form>
+
+</div>
+@endsection

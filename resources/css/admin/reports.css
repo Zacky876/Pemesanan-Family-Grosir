@@ -1,172 +1,535 @@
-* {
-    box-sizing: border-box;
-}
+.report-page {
+    --rep-blue: #2347ff;
+    --rep-blue-dark: #1a36d1;
+    --rep-navy: #0c2a7a;
+    --rep-navy-deep: #071a4d;
+    --rep-sky: #38bdf8;
+    --rep-orange: #ff7a2f;
+    --rep-blue-50: #f3f6ff;
+    --rep-blue-100: #e4ebff;
+    --rep-surface: #ffffff;
+    --rep-line: #e0e7fb;
+    --rep-text: #0e1a40;
+    --rep-muted: #5a6891;
+    --rep-red: #e5484d;
+    --rep-red-dark: #b3262b;
+    --rep-red-soft: #ffe5e6;
+    --rep-green: #12a36b;
+    --rep-green-dark: #0b7a50;
+    --rep-green-soft: #dff5ec;
+    --rep-amber: #f5a524;
+    --rep-amber-dark: #915c00;
+    --rep-amber-soft: #fff1d6;
+    --rep-radius: 20px;
+    --rep-shadow: 0 12px 32px -16px rgba(25, 55, 170, 0.28);
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    color: #222;
-}
-
-.report-container {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 25px;
-    background: white;
-    border-radius: 8px;
-}
-
-.report-container h2 {
-    margin-top: 0;
-}
-
-.report-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin: 25px 0;
-}
-
-.report-card {
-    display: block;
-    padding: 25px;
-    border: 1px solid #ddd;
-    border-radius: 7px;
-    text-decoration: none;
-    color: #222;
-    transition: background 0.2s;
-}
-
-.report-card:hover {
-    background: #f5f5f5;
-}
-
-.report-card h3 {
-    margin-top: 0;
-}
-
-.report-card p {
-    line-height: 1.6;
-    color: #666;
-}
-
-.report-container a:not(.report-card) {
-    color: #222;
-}
-
-@media (max-width: 650px) {
-    .report-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .report-container {
-        margin: 10px;
-        padding: 15px;
-    }
-}
-
-.filter-form {
-    display: flex;
-    align-items: end;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin: 25px 0;
-}
-
-.filter-form div {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 20px;
+    width: 100%;
+    color: var(--rep-text);
 }
 
-.filter-form label {
-    font-weight: bold;
+.report-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
-.filter-form input,
-.filter-form select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.report-toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.filter-form button {
+.report-hint {
+    color: var(--rep-muted);
+    font-size: 13.5px;
+}
+
+/* ---------- Tombol ---------- */
+
+.report-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     padding: 10px 20px;
-    border: 1px solid #222;
-    border-radius: 5px;
-    background: #222;
-    color: white;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4a6bff, var(--rep-blue));
+    box-shadow: 0 10px 20px -10px rgba(35, 71, 255, 0.7);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+    white-space: nowrap;
     cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
 }
 
-.filter-form button:hover {
-    background: #444;
+.report-btn:hover {
+    background: linear-gradient(135deg, var(--rep-blue), var(--rep-blue-dark));
 }
 
-.table-wrapper {
+.report-btn:focus-visible {
+    outline: 3px solid rgba(35, 71, 255, 0.35);
+    outline-offset: 2px;
+}
+
+.report-btn--ghost {
+    background: var(--rep-surface);
+    border-color: var(--rep-line);
+    box-shadow: none;
+    color: var(--rep-navy);
+}
+
+.report-btn--ghost:hover {
+    background: var(--rep-blue-50);
+    border-color: var(--rep-blue);
+    color: var(--rep-blue);
+}
+
+/* ---------- Kartu umum ---------- */
+
+.report-card {
+    border: 1px solid var(--rep-line);
+    border-radius: var(--rep-radius);
+    background: var(--rep-surface);
+    box-shadow: var(--rep-shadow);
+}
+
+/* ---------- Menu laporan (index) ---------- */
+
+.report-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.report-menu-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 28px;
+    overflow: hidden;
+    border: 1px solid var(--rep-line);
+    border-radius: var(--rep-radius);
+    background: var(--rep-surface);
+    box-shadow: var(--rep-shadow);
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s;
+}
+
+.report-menu-card::after {
+    content: '';
+    position: absolute;
+    right: -50px;
+    top: -50px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(35, 71, 255, 0.1), transparent 70%);
+}
+
+.report-menu-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--rep-blue);
+    box-shadow: 0 22px 40px -20px rgba(35, 71, 255, 0.45);
+}
+
+.report-menu-icon {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 6px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #5b7bff, var(--rep-blue));
+    box-shadow: 0 12px 22px -10px rgba(35, 71, 255, 0.65);
+    color: #fff;
+}
+
+.report-menu-icon--orange {
+    background: linear-gradient(135deg, #ffa35c, var(--rep-orange));
+    box-shadow: 0 12px 22px -10px rgba(255, 122, 47, 0.65);
+}
+
+.report-menu-icon svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.report-menu-card h2 {
+    margin: 0;
+    color: var(--rep-navy-deep);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.report-menu-card p {
+    margin: 0;
+    color: var(--rep-muted);
+    font-size: 14.5px;
+    line-height: 1.6;
+}
+
+.report-menu-card .report-menu-link {
+    margin-top: 8px;
+    color: var(--rep-blue);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* ---------- Filter (penjualan) ---------- */
+
+.report-filter {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+    padding: 22px 24px;
+}
+
+.report-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.report-field input,
+.report-field select {
     width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--rep-line);
+    border-radius: 12px;
+    background: var(--rep-surface);
+    color: var(--rep-text);
+    font: inherit;
+    transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.report-field input:focus,
+.report-field select:focus {
+    outline: none;
+    border-color: var(--rep-blue);
+    box-shadow: 0 0 0 4px rgba(35, 71, 255, 0.14);
+}
+
+.report-filter .report-btn {
+    padding-top: 11px;
+    padding-bottom: 11px;
+}
+
+/* ---------- Ringkasan (tile) ---------- */
+
+.report-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.report-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px 22px;
+    border: 1px solid var(--rep-line);
+    border-radius: var(--rep-radius);
+    background: var(--rep-surface);
+    box-shadow: var(--rep-shadow);
+}
+
+.report-tile span {
+    color: var(--rep-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.report-tile strong {
+    color: var(--rep-navy-deep);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.report-tile--accent {
+    border-color: transparent;
+    background:
+        radial-gradient(circle at 90% 0%, rgba(90, 140, 255, 0.55), transparent 55%),
+        linear-gradient(120deg, var(--rep-navy-deep), var(--rep-navy) 55%, #1b45c9);
+    box-shadow: 0 20px 40px -22px rgba(12, 42, 122, 0.8);
+}
+
+.report-tile--accent span { color: #c3d4ff; }
+.report-tile--accent strong { color: #fff; }
+
+/* Tile stok dengan garis warna di kiri */
+.report-tile--ok  { box-shadow: inset 5px 0 0 var(--rep-green), var(--rep-shadow); }
+.report-tile--low { box-shadow: inset 5px 0 0 var(--rep-amber), var(--rep-shadow); }
+.report-tile--out { box-shadow: inset 5px 0 0 var(--rep-red),   var(--rep-shadow); }
+
+/* ---------- Komposisi stok ---------- */
+
+.report-compose {
+    padding: 22px 26px;
+}
+
+.report-compose h2 {
+    margin: 0 0 14px;
+    color: var(--rep-navy);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.report-compose-bar {
+    display: flex;
+    height: 14px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: var(--rep-blue-100);
+}
+
+.report-compose-bar i {
+    display: block;
+    height: 100%;
+}
+
+.report-compose-bar .is-ok  { background: linear-gradient(90deg, #38d6a0, var(--rep-green)); }
+.report-compose-bar .is-low { background: linear-gradient(90deg, #ffd27a, var(--rep-amber)); }
+.report-compose-bar .is-out { background: linear-gradient(90deg, #ff8a8d, var(--rep-red)); }
+
+.report-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-top: 14px;
+    color: var(--rep-muted);
+    font-size: 13.5px;
+}
+
+.report-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.report-legend b {
+    color: var(--rep-text);
+}
+
+.report-legend i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.report-legend .is-ok  { background: var(--rep-green); }
+.report-legend .is-low { background: var(--rep-amber); }
+.report-legend .is-out { background: var(--rep-red); }
+
+/* ---------- Bagian tabel ---------- */
+
+.report-section {
+    overflow: hidden;
+}
+
+.report-section-head {
+    padding: 22px 26px 4px;
+}
+
+.report-section-head h2 {
+    margin: 0 0 4px;
+    color: var(--rep-navy);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.report-section-head p {
+    margin: 0;
+    color: var(--rep-muted);
+    font-size: 13.5px;
+}
+
+.report-table-wrap {
+    margin-top: 16px;
     overflow-x: auto;
-    margin-bottom: 30px;
 }
 
-.report-container table {
+.report-table {
     width: 100%;
+    min-width: 640px;
     border-collapse: collapse;
-    margin-top: 15px;
-    background: white;
 }
 
-.report-container th,
-.report-container td {
-    padding: 12px;
-    border: 1px solid #ddd;
+.report-table--wide {
+    min-width: 900px;
+}
+
+.report-table th,
+.report-table td {
+    padding: 14px 18px;
     text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--rep-line);
 }
 
-.report-container th {
-    background: #eee;
+.report-table th {
+    border-top: 1px solid var(--rep-line);
+    background: var(--rep-blue-50);
+    color: var(--rep-navy);
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
-.empty-data {
+.report-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.report-table tbody tr:hover {
+    background: #f6f9ff;
+}
+
+.report-table .is-num {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.report-table td.is-bar {
+    min-width: 200px;
+}
+
+.report-code {
+    color: var(--rep-blue);
+    font-weight: 700;
+}
+
+.report-rank {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--rep-blue-100);
+    color: var(--rep-blue);
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.report-table tbody tr:first-child .report-rank {
+    background: linear-gradient(135deg, #ffa35c, var(--rep-orange));
+    color: #fff;
+}
+
+/* Batang proporsi di bawah angka penjualan */
+.report-amount {
+    display: block;
+    text-align: right;
+    font-weight: 700;
+}
+
+.report-bar {
+    display: block;
+    height: 6px;
+    margin-top: 6px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: var(--rep-blue-100);
+}
+
+.report-bar i {
+    display: block;
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--rep-sky), var(--rep-blue));
+}
+
+.report-empty {
+    padding: 44px 20px !important;
     text-align: center !important;
-    color: #777;
-    padding: 20px !important;
+    color: var(--rep-muted);
 }
 
-@media (max-width: 650px) {
-    .filter-form {
-        align-items: stretch;
-        flex-direction: column;
+/* Baris stok */
+.report-table tbody tr.is-low { background: #fffaf0; }
+.report-table tbody tr.is-out { background: #fff8f8; }
+.report-table tbody tr.is-low td:first-child { box-shadow: inset 4px 0 0 var(--rep-amber); }
+.report-table tbody tr.is-out td:first-child { box-shadow: inset 4px 0 0 var(--rep-red); }
+
+/* ---------- Lencana status stok ---------- */
+
+.report-badge {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.report-badge--ok  { background: var(--rep-green-soft); color: var(--rep-green-dark); }
+.report-badge--low { background: var(--rep-amber-soft); color: var(--rep-amber-dark); }
+.report-badge--out { background: var(--rep-red-soft);   color: var(--rep-red-dark); }
+
+/* ---------- Responsif ---------- */
+
+@media (max-width: 720px) {
+    .report-filter {
+        grid-template-columns: 1fr;
+        padding: 18px;
     }
 
-    .filter-form input,
-    .filter-form select,
-    .filter-form button {
+    .report-toolbar-actions,
+    .report-toolbar-actions .report-btn,
+    .report-toolbar > .report-btn {
         width: 100%;
     }
+
+    .report-section-head {
+        padding: 18px 18px 4px;
+    }
+
+    .report-compose {
+        padding: 18px;
+    }
 }
 
-.stock-status {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: bold;
-}
+/* ---------- Cetak ---------- */
 
-.stock-status.available {
-    background: #e5e5e5;
-    color: #222;
-}
+@media print {
+    .sidebar,
+    .topbar,
+    .footer,
+    .report-toolbar,
+    .report-filter {
+        display: none !important;
+    }
 
-.stock-status.low {
-    background: #fff0c2;
-    color: #8a6200;
-}
+    body {
+        display: block;
+        background: #fff !important;
+    }
 
-.stock-status.out {
-    background: #ffdada;
-    color: #a00000;
+    .content {
+        padding: 0 !important;
+    }
+
+    .report-card,
+    .report-tile {
+        box-shadow: none !important;
+    }
 }

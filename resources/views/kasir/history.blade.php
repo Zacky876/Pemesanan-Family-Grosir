@@ -1,122 +1,112 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Transaksi Kasir</title>
+@extends('kasir.layouts.app')
 
-    @vite(['resources/css/kasir/transactions.css'])
-</head>
-<body>
+@section('title', 'Riwayat Transaksi')
+@section('page_title', 'Riwayat Transaksi Kasir')
+@section('page_subtitle', 'Transaksi yang sudah Anda proses.')
 
-<div class="transaction-container">
+@push('styles')
+    @vite('resources/css/kasir/transactions.css')
+@endpush
 
-    <h2>Riwayat Transaksi Kasir</h2>
+@section('content')
+@php
+    $statusMap = [
+        'completed' => ['Selesai', 'success'],
+        'pending'   => ['Menunggu', 'warning'],
+        'cancelled' => ['Dibatalkan', 'danger'],
+    ];
+@endphp
 
-    <form action="{{ route('kasir.history') }}"
-          method="GET"
-          class="filter-form">
+<div class="history-page">
+
+    <div class="history-toolbar">
+        <span class="history-hint">{{ $transactions->total() }} transaksi ditemukan</span>
+
+        <a href="{{ route('kasir.pos') }}" class="history-btn">+ Transaksi baru</a>
+    </div>
+
+    {{-- ===== Filter ===== --}}
+    <form action="{{ route('kasir.history') }}" method="GET" class="history-card filter-form">
 
         <div class="filter-group">
-            <label for="search">Cari Transaksi</label>
-            <input
-                type="text"
-                id="search"
-                name="search"
-                placeholder="Cari kode transaksi..."
-                value="{{ request('search') }}"
-            >
+            <label for="search">Cari transaksi</label>
+            <input type="text" id="search" name="search"
+                   placeholder="Cari kode transaksi"
+                   value="{{ request('search') }}">
         </div>
 
         <div class="filter-group">
-            <label for="start_date">Tanggal Mulai</label>
-            <input
-                type="date"
-                id="start_date"
-                name="start_date"
-                value="{{ request('start_date') }}"
-            >
+            <label for="start_date">Tanggal mulai</label>
+            <input type="date" id="start_date" name="start_date"
+                   value="{{ request('start_date') }}">
         </div>
 
         <div class="filter-group">
-            <label for="end_date">Tanggal Akhir</label>
-            <input
-                type="date"
-                id="end_date"
-                name="end_date"
-                value="{{ request('end_date') }}"
-            >
+            <label for="end_date">Tanggal akhir</label>
+            <input type="date" id="end_date" name="end_date"
+                   value="{{ request('end_date') }}">
         </div>
 
         <div class="filter-actions">
-            <button type="submit" class="filter-button">
-                Filter
-            </button>
-
-            <a href="{{ route('kasir.history') }}" class="reset-button">
-                Reset
-            </a>
+            <button type="submit" class="filter-button">Filter</button>
+            <a href="{{ route('kasir.history') }}" class="reset-button">Reset</a>
         </div>
 
     </form>
 
-    <table class="transaction-table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Kode Transaksi</th>
-                <th>Tanggal</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
+    {{-- ===== Tabel ===== --}}
+    <div class="history-table-wrap">
+        <table class="transaction-table">
 
-        <tbody>
-            @forelse ($transactions as $transaction)
+            <thead>
                 <tr>
-                    <td>
-                        {{ $transactions->firstItem() + $loop->index }}
-                    </td>
-
-                    <td>{{ $transaction->transaction_code }}</td>
-
-                    <td>
-                        {{ $transaction->transaction_date->format('d-m-Y H:i') }}
-                    </td>
-
-                    <td>
-                        Rp{{ number_format($transaction->total, 0, ',', '.') }}
-                    </td>
-
-                    <td>{{ ucfirst($transaction->status) }}</td>
-
-                    <td>
-                        <a
-                            href="{{ route('kasir.transaction.receipt', $transaction->id) }}"
-                            class="detail-link"
-                        >
-                            Detail / Cetak Struk
-                        </a>
-                    </td>
+                    <th>No</th>
+                    <th>Kode transaksi</th>
+                    <th>Tanggal</th>
+                    <th class="is-num">Total</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="6" style="text-align:center;">
-                        Belum ada transaksi.
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
 
-    {{ $transactions->links() }}
+            <tbody>
+                @forelse ($transactions as $transaction)
+                    @php
+                        [$label, $badge] = $statusMap[$transaction->status]
+                            ?? [ucfirst($transaction->status), 'muted'];
+                    @endphp
 
-    <p>
-        <a href="{{ route('kasir.dashboard') }}">Kembali ke Dashboard</a>
-    </p>
+                    <tr>
+                        <td>{{ $transactions->firstItem() + $loop->index }}</td>
+
+                        <td><span class="history-code">{{ $transaction->transaction_code }}</span></td>
+
+                        <td>{{ $transaction->transaction_date->format('d-m-Y H:i') }}</td>
+
+                        <td class="is-num"><strong>Rp {{ number_format($transaction->total, 0, ',', '.') }}</strong></td>
+
+                        <td><span class="history-badge history-badge--{{ $badge }}">{{ $label }}</span></td>
+
+                        <td>
+                            <a href="{{ route('kasir.transaction.receipt', $transaction->id) }}"
+                               class="detail-link">Detail / cetak struk</a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="history-empty">Belum ada transaksi.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+
+        </table>
+    </div>
+
+    @if ($transactions->hasPages())
+        <div class="history-pagination">
+            {{ $transactions->withQueryString()->links('pagination::default') }}
+        </div>
+    @endif
 
 </div>
-
-</body>
-</html>
+@endsection

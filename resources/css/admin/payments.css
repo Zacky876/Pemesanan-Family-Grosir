@@ -1,0 +1,301 @@
+.payment-page {
+    --pay-blue: #2347ff;
+    --pay-blue-dark: #1a36d1;
+    --pay-navy: #0c2a7a;
+    --pay-navy-deep: #071a4d;
+    --pay-blue-50: #f3f6ff;
+    --pay-surface: #ffffff;
+    --pay-line: #e0e7fb;
+    --pay-text: #0e1a40;
+    --pay-muted: #5a6891;
+    --pay-red: #e5484d;
+    --pay-red-dark: #b3262b;
+    --pay-red-soft: #ffe5e6;
+    --pay-green: #0b7a50;
+    --pay-green-soft: #dff5ec;
+    --pay-amber: #915c00;
+    --pay-amber-soft: #fff1d6;
+    --pay-indigo: #4b3fd6;
+    --pay-indigo-soft: #e9e7ff;
+    --pay-radius: 20px;
+    --pay-shadow: 0 12px 32px -16px rgba(25, 55, 170, 0.28);
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    color: var(--pay-text);
+}
+
+.payment-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.payment-hint {
+    color: var(--pay-muted);
+    font-size: 13.5px;
+}
+
+/* ---------- Tombol ---------- */
+
+.payment-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4a6bff, var(--pay-blue));
+    box-shadow: 0 10px 20px -10px rgba(35, 71, 255, 0.7);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.payment-btn:hover {
+    background: linear-gradient(135deg, var(--pay-blue), var(--pay-blue-dark));
+}
+
+.payment-btn:focus-visible {
+    outline: 3px solid rgba(35, 71, 255, 0.35);
+    outline-offset: 2px;
+}
+
+.payment-btn--ghost {
+    background: var(--pay-surface);
+    border-color: var(--pay-line);
+    box-shadow: none;
+    color: var(--pay-navy);
+}
+
+.payment-btn--ghost:hover {
+    background: var(--pay-blue-50);
+    border-color: var(--pay-blue);
+    color: var(--pay-blue);
+}
+
+.payment-btn--danger {
+    background: linear-gradient(135deg, #ff7a7e, var(--pay-red));
+    box-shadow: 0 10px 20px -10px rgba(229, 72, 77, 0.7);
+}
+
+.payment-btn--danger:hover {
+    background: linear-gradient(135deg, var(--pay-red), var(--pay-red-dark));
+}
+
+.payment-btn--small {
+    padding: 8px 14px;
+    border-radius: 10px;
+    box-shadow: none;
+    font-size: 13.5px;
+}
+
+/* ---------- Ringkasan ---------- */
+
+.payment-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.payment-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px 22px;
+    border: 1px solid var(--pay-line);
+    border-radius: var(--pay-radius);
+    background: var(--pay-surface);
+    box-shadow: var(--pay-shadow);
+}
+
+.payment-tile span {
+    color: var(--pay-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.payment-tile strong {
+    color: var(--pay-navy-deep);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+}
+
+.payment-tile--accent {
+    border-color: transparent;
+    background:
+        radial-gradient(circle at 90% 0%, rgba(90, 140, 255, 0.55), transparent 55%),
+        linear-gradient(120deg, var(--pay-navy-deep), var(--pay-navy) 55%, #1b45c9);
+    box-shadow: 0 20px 40px -22px rgba(12, 42, 122, 0.8);
+}
+
+.payment-tile--accent span { color: #c3d4ff; }
+.payment-tile--accent strong { color: #fff; }
+
+/* ---------- Kartu & tabel ---------- */
+
+.payment-card {
+    overflow: hidden;
+    border: 1px solid var(--pay-line);
+    border-radius: var(--pay-radius);
+    background: var(--pay-surface);
+    box-shadow: var(--pay-shadow);
+}
+
+.payment-card-head {
+    padding: 22px 26px 6px;
+}
+
+.payment-card-head h2 {
+    margin: 0 0 4px;
+    color: var(--pay-navy);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.payment-card-head p {
+    margin: 0;
+    color: var(--pay-muted);
+    font-size: 13.5px;
+}
+
+.payment-table-wrap {
+    margin-top: 16px;
+    overflow-x: auto;
+}
+
+.payment-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+.payment-table th,
+.payment-table td {
+    padding: 16px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--pay-line);
+}
+
+.payment-table th {
+    border-top: 1px solid var(--pay-line);
+    background: var(--pay-blue-50);
+    color: var(--pay-navy);
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.payment-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.payment-table tbody tr:hover {
+    background: #f6f9ff;
+}
+
+.payment-table .is-num {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.payment-code {
+    color: var(--pay-blue);
+    font-weight: 700;
+}
+
+/* ---------- Lencana & tautan bukti ---------- */
+
+.payment-badge {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.payment-badge--qris    { background: var(--pay-indigo-soft); color: var(--pay-indigo); }
+.payment-badge--cash    { background: var(--pay-green-soft);  color: var(--pay-green); }
+.payment-badge--warning { background: var(--pay-amber-soft);  color: var(--pay-amber); }
+.payment-badge--muted   { background: #eceff6; color: #566080; }
+
+/* ---------- Konfirmasi ---------- */
+
+.payment-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.payment-actions form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+    margin: 0;
+}
+
+.payment-field label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--pay-muted);
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.payment-field input {
+    width: 170px;
+    padding: 9px 12px;
+    border: 1px solid var(--pay-line);
+    border-radius: 10px;
+    background: var(--pay-surface);
+    color: var(--pay-text);
+    font: inherit;
+    transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.payment-field input:focus {
+    outline: none;
+    border-color: var(--pay-blue);
+    box-shadow: 0 0 0 4px rgba(35, 71, 255, 0.14);
+}
+
+.payment-empty {
+    padding: 52px 20px !important;
+    text-align: center !important;
+    color: var(--pay-muted);
+}
+
+.payment-empty strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--pay-navy);
+    font-size: 16px;
+}
+
+/* ---------- Responsif ---------- */
+
+@media (max-width: 720px) {
+    .payment-card-head {
+        padding: 18px 18px 4px;
+    }
+
+    .payment-toolbar .payment-btn {
+        width: 100%;
+    }
+}

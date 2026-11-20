@@ -1,133 +1,274 @@
-/* HALAMAN STRUK TRANSAKSI */
+/* Struk transaksi - halaman berdiri sendiri, variabel dibuat di sini */
+
+:root {
+    --r-navy-deep: #071a4d;
+    --r-navy: #0c2a7a;
+    --r-blue: #2347ff;
+    --r-blue-dark: #1a36d1;
+    --r-orange: #ff7a2f;
+    --r-blue-50: #f3f6ff;
+    --r-line: #cfd9f5;
+    --r-text: #0e1a40;
+    --r-muted: #5a6891;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 body {
-    background: #f5f5f5;
-    color: #222;
+    min-height: 100vh;
+    padding: 32px 16px 48px;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: linear-gradient(160deg, #f5f8ff 0%, #e4ecff 55%, #d7e2ff 100%) fixed;
+    color: var(--r-text);
 }
 
 .receipt-container {
-    max-width: 500px;
-    margin: 30px auto;
-    padding: 25px;
-    background: white;
-    border: 1px solid #ddd;
-}
-
-.receipt-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.receipt-header h2 {
-    margin-bottom: 5px;
-}
-
-.receipt-header p {
-    margin: 4px 0;
-    font-size: 13px;
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 30px 28px 26px;
+    border: 1px solid #e0e7fb;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 24px 48px -24px rgba(25, 55, 170, 0.35);
 }
 
 .receipt-container hr {
-    border: none;
-    border-top: 1px dashed #999;
-    margin: 15px 0;
+    height: 0;
+    margin: 18px 0;
+    border: 0;
+    border-top: 2px dashed var(--r-line);
 }
+
+/* ---------- Kepala ---------- */
+
+.receipt-header {
+    text-align: center;
+}
+
+.receipt-logo {
+    display: inline-grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 10px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #ffa35c, var(--r-orange));
+    box-shadow: 0 12px 22px -10px rgba(255, 122, 47, 0.7);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.receipt-header h2 {
+    color: var(--r-navy-deep);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.receipt-header p {
+    margin-top: 2px;
+    color: var(--r-muted);
+    font-size: 13.5px;
+}
+
+.receipt-container h3 {
+    margin-bottom: 10px;
+    color: var(--r-navy);
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+/* ---------- Informasi & pembayaran ---------- */
 
 .receipt-info p,
 .receipt-payment p {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
-    font-size: 13px;
-    margin: 10px 0;
+    gap: 16px;
+    padding: 4px 0;
+    font-size: 14px;
+}
+
+.receipt-info span,
+.receipt-payment span {
+    color: var(--r-muted);
 }
 
 .receipt-info strong,
 .receipt-payment strong {
     text-align: right;
+    font-variant-numeric: tabular-nums;
 }
 
-.receipt-container h3 {
-    font-size: 15px;
-    margin-bottom: 12px;
+.receipt-payment p:first-child strong {
+    color: var(--r-navy-deep);
+    font-size: 16px;
 }
+
+.receipt-payment .change {
+    margin-top: 8px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background:
+        radial-gradient(circle at 95% 0%, rgba(90, 140, 255, 0.55), transparent 55%),
+        linear-gradient(120deg, var(--r-navy-deep), var(--r-navy) 60%, #1b45c9);
+    color: #fff;
+}
+
+.receipt-payment .change span {
+    color: #c3d4ff;
+}
+
+.receipt-payment .change strong {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+/* ---------- Tabel produk ---------- */
 
 .receipt-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12px;
+    font-size: 14px;
 }
 
-.receipt-table th,
-.receipt-table td {
-    padding: 8px 4px;
+.receipt-table th {
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--r-line);
+    color: var(--r-muted);
+    font-size: 12.5px;
+    font-weight: 600;
     text-align: left;
+}
+
+.receipt-table td {
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--r-line);
     vertical-align: top;
 }
 
-.receipt-table th:last-child,
-.receipt-table td:last-child {
-    text-align: right;
+.receipt-table tbody tr:last-child td {
+    border-bottom: 0;
 }
 
-.receipt-table small {
+.receipt-table td small {
     display: block;
-    color: #666;
-    margin-top: 3px;
+    margin-top: 1px;
+    color: var(--r-muted);
+    font-size: 12px;
 }
 
-.receipt-payment .change {
-    font-size: 15px;
-    font-weight: bold;
+.receipt-table .is-num {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
+
+.receipt-table td:first-child {
+    font-weight: 600;
+}
+
+/* ---------- Kaki ---------- */
 
 .receipt-footer {
     text-align: center;
-    font-size: 12px;
-    margin-top: 20px;
 }
+
+.receipt-footer p {
+    margin-bottom: 6px;
+    color: var(--r-muted);
+    font-size: 12.5px;
+}
+
+.receipt-footer strong {
+    color: var(--r-navy);
+    font-size: 15px;
+}
+
+/* ---------- Tombol ---------- */
 
 .receipt-actions {
     display: flex;
     gap: 10px;
-    margin-top: 25px;
+    margin-top: 22px;
 }
 
 .print-button,
 .back-button {
     flex: 1;
-    padding: 11px;
-    border: none;
-    border-radius: 5px;
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
     text-decoration: none;
     cursor: pointer;
-    font-size: 13px;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
 }
 
 .print-button {
-    background: #222;
-    color: white;
+    background: linear-gradient(135deg, #4a6bff, var(--r-blue));
+    box-shadow: 0 10px 20px -10px rgba(35, 71, 255, 0.7);
+    color: #fff;
+}
+
+.print-button:hover {
+    background: linear-gradient(135deg, var(--r-blue), var(--r-blue-dark));
 }
 
 .back-button {
-    background: #ddd;
-    color: #222;
+    background: #fff;
+    border-color: #e0e7fb;
+    color: var(--r-navy);
 }
+
+.back-button:hover {
+    background: var(--r-blue-50);
+    border-color: var(--r-blue);
+    color: var(--r-blue);
+}
+
+/* ---------- Cetak ---------- */
 
 @media print {
     body {
-        background: white;
+        padding: 0;
+        background: #fff;
     }
 
     .receipt-container {
-        max-width: 100%;
-        margin: 0;
-        padding: 10px;
-        border: none;
+        max-width: none;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
     }
 
     .no-print {
         display: none !important;
+    }
+
+    .receipt-payment .change {
+        background: none;
+        border: 1px solid #000;
+        color: #000;
+    }
+
+    .receipt-payment .change span,
+    .receipt-payment .change strong {
+        color: #000;
     }
 }

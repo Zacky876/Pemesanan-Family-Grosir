@@ -1,133 +1,145 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Pembelian</title>
+@extends('user.layout.app')
 
-    @vite(['resources/css/user/transactions.css'])
-</head>
-<body>
+@section('title', 'Riwayat Pembelian')
+@section('page_title', 'Riwayat Pembelian Saya')
+@section('page_subtitle', 'Pantau status pesanan dan pembayaran Anda.')
 
-<div class="transaction-container">
+@section('content')
+@php
+    // Daftar pesanan (nama variabel dari controller: $orders atau $transactions)
+    $daftar = $orders ?? $transactions ?? collect();
+    $jumlah = method_exists($daftar, 'total') ? $daftar->total() : $daftar->count();
+    $adaDetail = \Illuminate\Support\Facades\Route::has('user.orders.show');
 
-    <h2>Riwayat Pembelian Saya</h2>
+    // Label dan warna lencana status pesanan
+    $statusPesanan = [
+        'pending'    => ['Menunggu diproses', 'warning'],
+        'processing' => ['Diproses', 'info'],
+        'completed'  => ['Selesai', 'success'],
+        'cancelled'  => ['Dibatalkan', 'danger'],
+    ];
 
-    <form action="{{ route('user.orders.index') }}"
-          method="GET"
-          class="filter-form">
+    // Label dan warna lencana status pembayaran
+    $statusBayar = [
+        'unpaid'  => ['Belum dibayar', 'warning'],
+        'pending' => ['Menunggu verifikasi', 'warning'],
+        'paid'    => ['Lunas', 'success'],
+        'failed'  => ['Gagal', 'danger'],
+    ];
+@endphp
 
-        <div class="filter-group">
-            <label for="search">Cari Transaksi</label>
+<div class="catalog-page">
 
-            <input
-                type="text"
-                id="search"
-                name="search"
-                placeholder="Cari kode transaksi..."
-                value="{{ request('search') }}"
-            >
+    {{-- Pesan sukses/error ditampilkan otomatis oleh layout --}}
+
+    <div class="catalog-toolbar">
+        <span class="catalog-hint">{{ $jumlah }} pesanan ditemukan</span>
+
+        <a href="{{ route('user.products.index') }}" class="catalog-btn catalog-btn--ghost">
+            + Belanja lagi
+        </a>
+    </div>
+
+    {{-- ===== Cari dan filter ===== --}}
+    <form action="{{ route('user.orders.index') }}" method="GET" class="catalog-card catalog-filter">
+
+        <div class="catalog-field">
+            <label for="search">Cari transaksi</label>
+            <input type="text" id="search" name="search"
+                   value="{{ request('search') }}"
+                   placeholder="Cari kode transaksi">
         </div>
 
-        <div class="filter-group">
-            <label for="status">Status Pesanan</label>
-
-            <select name="status" id="status">
-                <option value="">Semua Status</option>
-
-                <option value="pending"
-                    {{ request('status') == 'pending' ? 'selected' : '' }}>
-                    Pending
-                </option>
-
-                <option value="completed"
-                    {{ request('status') == 'completed' ? 'selected' : '' }}>
-                    Completed
-                </option>
-
-                <option value="cancelled"
-                    {{ request('status') == 'cancelled' ? 'selected' : '' }}>
-                    Cancelled
-                </option>
+        <div class="catalog-field">
+            <label for="status">Status pesanan</label>
+            <select id="status" name="status">
+                <option value="">Semua status</option>
+                @foreach ($statusPesanan as $nilai => [$label])
+                    <option value="{{ $nilai }}" {{ request('status') == $nilai ? 'selected' : '' }}>
+                        {{ $label }}
+                    </option>
+                @endforeach
             </select>
         </div>
 
-        <div class="filter-actions">
-            <button type="submit" class="filter-button">
-                Cari
-            </button>
-
-            <a href="{{ route('user.orders.index') }}"
-               class="reset-button">
-                Reset
-            </a>
+        <div class="catalog-filter-actions">
+            <button type="submit" class="catalog-btn">Cari</button>
+            <a href="{{ route('user.orders.index') }}" class="catalog-btn catalog-btn--ghost">Reset</a>
         </div>
 
     </form>
 
-    <table class="transaction-table">
+    {{-- ===== Tabel riwayat ===== --}}
+    <div class="shop-table-wrap">
+        <table class="shop-table order-table">
 
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Kode Transaksi</th>
-                <th>Tanggal</th>
-                <th>Total</th>
-                <th>Status Pesanan</th>
-                <th>Status Pembayaran</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @forelse ($orders as $order)
+            <thead>
                 <tr>
-                    <td>
-                        {{ $orders->firstItem() + $loop->index }}
-                    </td>
-
-                    <td>{{ $order->transaction_code }}</td>
-
-                    <td>
-                        {{ $order->transaction_date->format('d-m-Y H:i') }}
-                    </td>
-
-                    <td>
-                        Rp{{ number_format($order->total, 0, ',', '.') }}
-                    </td>
-
-                    <td>{{ ucfirst($order->status) }}</td>
-
-                    <td>{{ ucfirst($order->payment_status ?? 'pending') }}</td>
-
-                    <td>
-                        <a
-                            href="{{ route('user.orders.show', $order->id) }}"
-                            class="detail-link"
-                        >
-                            Detail
-                        </a>
-                    </td>
+                    <th>No</th>
+                    <th>Kode transaksi</th>
+                    <th>Tanggal</th>
+                    <th class="is-num">Total</th>
+                    <th>Status pesanan</th>
+                    <th>Status pembayaran</th>
+                    <th>Aksi</th>
                 </tr>
+            </thead>
 
-            @empty
-                <tr>
-                    <td colspan="7" style="text-align:center;">
-                        Belum ada riwayat pembelian.
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
+            <tbody>
+                @forelse ($daftar as $order)
+                    @php
+                        $nomor = method_exists($daftar, 'firstItem')
+                            ? $daftar->firstItem() + $loop->index
+                            : $loop->iteration;
 
-    </table>
+                        $kodeStatus = strtolower((string) $order->status);
+                        [$labelStatus, $warnaStatus] = $statusPesanan[$kodeStatus]
+                            ?? [ucfirst((string) $order->status), 'muted'];
 
-    {{ $orders->links() }}
+                        $kodeBayar = strtolower((string) ($order->payment_status ?? ''));
+                        [$labelBayar, $warnaBayar] = $statusBayar[$kodeBayar]
+                            ?? [($order->payment_status ?? '-') ?: '-', 'muted'];
 
-    <p>
-        <a href="{{ route('user.dashboard') }}">Kembali ke Dashboard</a>
-    </p>
+                        $tanggal = $order->transaction_date ?? $order->created_at;
+                    @endphp
+
+                    <tr>
+                        <td>{{ $nomor }}</td>
+
+                        <td><span class="order-code">{{ $order->transaction_code }}</span></td>
+
+                        <td>{{ $tanggal?->format('d-m-Y H:i') ?? '-' }}</td>
+
+                        <td class="is-num"><strong>Rp {{ number_format($order->total, 0, ',', '.') }}</strong></td>
+
+                        <td><span class="order-badge order-badge--{{ $warnaStatus }}">{{ $labelStatus }}</span></td>
+
+                        <td><span class="order-badge order-badge--{{ $warnaBayar }}">{{ ucfirst($labelBayar) }}</span></td>
+
+                        <td>
+                            @if ($adaDetail)
+                                <a href="{{ route('user.orders.show', $order) }}"
+                                   class="catalog-btn catalog-btn--ghost catalog-btn--small">Detail</a>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="catalog-empty" style="padding: 44px 20px;">
+                            Belum ada riwayat pembelian.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+
+        </table>
+    </div>
+
+    @if (method_exists($daftar, 'hasPages') && $daftar->hasPages())
+        <div class="catalog-pagination">
+            {{ $daftar->withQueryString()->links('pagination::default') }}
+        </div>
+    @endif
 
 </div>
-
-</body>
-</html>
+@endsection

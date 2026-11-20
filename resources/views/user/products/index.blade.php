@@ -1,135 +1,144 @@
+@extends('user.layout.app')
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalog Produk</title>
-    @vite(['resources/css/user/user.css'])
-</head>
-<body>
-    <div class="dashboard-container">
-        <div class="dashboard-header">
-            <div class="header-title">
-                <h1>Katalog Produk</h1>
-                <p>Selamat berbelanja di minimarket kami.</p>
-            </div>
+@section('title', 'Katalog Produk')
+@section('page_title', 'Katalog Produk')
+@section('page_subtitle', 'Selamat berbelanja di minimarket kami.')
 
-            <div class="header-actions">
-                <a href="{{ route('user.cart.index') }}" class="btn">
-                    Lihat Keranjang
-                </a>
+@section('content')
+@php
+    $jumlah = method_exists($products, 'total') ? $products->total() : $products->count();
+    $adaKeranjang = \Illuminate\Support\Facades\Route::has('user.cart.add');
+    $adaDetail    = \Illuminate\Support\Facades\Route::has('user.products.show');
+@endphp
 
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit">Logout</button>
-                </form>
-            </div>
+<div class="catalog-page">
+
+    {{-- Pesan sukses/error ditampilkan otomatis oleh layout --}}
+
+    <div class="catalog-toolbar">
+        <span class="catalog-hint">{{ $jumlah }} produk ditemukan</span>
+
+        <a href="{{ route('user.cart.index') }}" class="catalog-btn catalog-btn--ghost">
+            Lihat keranjang
+        </a>
+    </div>
+
+    {{-- ===== Cari dan filter ===== --}}
+    <form action="{{ route('user.products.index') }}" method="GET" class="catalog-card catalog-filter">
+
+        <div class="catalog-field">
+            <label for="search">Cari produk</label>
+            <input type="text" id="search" name="search"
+                   value="{{ request('search') }}"
+                   placeholder="Cari nama atau kode produk">
         </div>
-        <p>
-            <a href="{{ route('user.dashboard') }}">Kembali ke Dashboard</a>
-        </p>
 
-        @if (session('success'))
-            <div class="success-message">
-                {{ session('success') }}
-            </div>
-        @endif
+        <div class="catalog-field">
+            <label for="category_id">Kategori</label>
+            <select id="category_id" name="category_id">
+                <option value="">Semua kategori</option>
+                @foreach (($categories ?? []) as $category)
+                    <option value="{{ $category->id }}"
+                        {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                        {{ $category->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-        <div class="dashboard-card">
-            <form
-                action="{{ route('user.products.index') }}"
-                method="GET"
-                style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;"
-            >
-                <input
-                    type="text"
-                    name="search"
-                    placeholder="Cari nama atau kode produk..."
-                    value="{{ request('search') }}"
-                >
+        <div class="catalog-filter-actions">
+            <button type="submit" class="catalog-btn">Cari</button>
+            <a href="{{ route('user.products.index') }}" class="catalog-btn catalog-btn--ghost">Reset</a>
+        </div>
 
-                <select name="category_id">
-                    <option value="">Semua Kategori</option>
+    </form>
 
-                    @foreach ($categories as $category)
-                        <option
-                            value="{{ $category->id }}"
-                            {{ request('category_id') == $category->id ? 'selected' : '' }}
-                        >
-                            {{ $category->name }}
-                        </option>
-                    @endforeach
-                </select>
+    {{-- ===== Daftar produk ===== --}}
+    @if ($products->count() > 0)
 
-                <button type="submit">Cari</button>
+        <div class="catalog-grid">
 
-                <a href="{{ route('user.products.index') }}" class="btn">
-                    Reset
-                </a>
-            </form>
+            @foreach ($products as $product)
+                @php
+                    $habis   = $product->stock < 1;
+                    $batas   = $product->minimum_stock ?? 5;
+                    $menipis = ! $habis && $product->stock <= $batas;
+                @endphp
 
-            <p>
-                Jumlah produk ditemukan: {{ $products->total() }}
-            </p>
+                <article class="catalog-item {{ $habis ? 'is-out' : '' }}">
 
-            <div class="product-grid">
-                @forelse ($products as $product)
-                    <div class="product-item">
+                    <div class="catalog-photo">
                         @if ($product->photo)
-                            <img
-                                src="{{ asset('storage/' . $product->photo) }}"
-                                alt="{{ $product->name }}"
-                                class="product-image"
-                            >
+                            <img src="{{ asset('storage/' . $product->photo) }}" alt="{{ $product->name }}">
                         @else
-                            <div class="product-no-image">
-                                Tidak ada foto
-                            </div>
+                            <span>Tidak ada foto</span>
                         @endif
+                    </div>
+
+                    <div class="catalog-info">
+
+                        <span class="catalog-code">{{ $product->code }}</span>
 
                         <h3>{{ $product->name }}</h3>
 
-                        <p>Kode: {{ $product->code }}</p>
+                        <p class="catalog-category">{{ $product->category->name ?? '-' }}</p>
 
-                        <p>
-                            Kategori:
-                            {{ $product->category->name ?? 'Tanpa kategori' }}
+                        <p class="catalog-price">
+                            Rp {{ number_format($product->selling_price, 0, ',', '.') }}
+                            <small>/ {{ $product->unit }}</small>
                         </p>
 
-                        <p>
-                            Harga:
-                            <strong>
-                                Rp{{ number_format($product->selling_price, 0, ',', '.') }}
-                            </strong>
+                        <p class="catalog-stock {{ $habis ? 'is-empty' : ($menipis ? 'is-low' : '') }}">
+                            @if ($habis)
+                                Stok habis
+                            @else
+                                Stok: {{ $product->stock }} {{ $product->unit }}
+                            @endif
                         </p>
 
-                        <p>
-                            Stok: {{ $product->stock }} {{ $product->unit }}
-                        </p>
+                        <div class="catalog-actions">
 
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <a href="{{ route('user.products.show', $product) }}" class="btn">
-                                Detail Produk
-                            </a>
+                            @if ($adaDetail)
+                                <a href="{{ route('user.products.show', $product) }}"
+                                   class="catalog-btn catalog-btn--ghost catalog-btn--small">Detail</a>
+                            @endif
 
-                            <form action="{{ route('user.cart.add', $product) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn">
-                                    Tambah ke Keranjang
-                                </button>
-                            </form>
+                            @if ($adaKeranjang)
+                                <form action="{{ route('user.cart.add', $product) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="quantity" value="1">
+
+                                    <button type="submit"
+                                            class="catalog-btn catalog-btn--small"
+                                            {{ $habis ? 'disabled' : '' }}>
+                                        {{ $habis ? 'Stok habis' : '+ Keranjang' }}
+                                    </button>
+                                </form>
+                            @endif
+
                         </div>
-                    </div>
-                @empty
-                    <p>Produk tidak ditemukan atau stok sedang habis.</p>
-                @endforelse
-            </div>
 
-            <div style="margin-top: 20px;">
-                {{ $products->links() }}
-            </div>
+                    </div>
+
+                </article>
+            @endforeach
+
         </div>
-    </div>
-</body>
-</html>
+
+        @if (method_exists($products, 'hasPages') && $products->hasPages())
+            <div class="catalog-pagination">
+                {{ $products->withQueryString()->links('pagination::default') }}
+            </div>
+        @endif
+
+    @else
+
+        <div class="catalog-card catalog-empty">
+            <h3>Produk tidak ditemukan</h3>
+            <p>Coba gunakan nama, kode, atau kategori produk lainnya.</p>
+        </div>
+
+    @endif
+
+</div>
+@endsection

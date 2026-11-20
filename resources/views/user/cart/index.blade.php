@@ -1,115 +1,115 @@
+@extends('user.layout.app')
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keranjang Belanja</title>
-    
-    @vite(['resources/css/user/user.css'])
-</head>
-<body>
-    <main class="dashboard-container">
-        <header class="dashboard-header">
-            <h1>Keranjang Belanja</h1>
-            <a href="{{ route('user.products.index') }}" class="btn">
-                Kembali ke Produk
-            </a>
-        </header>
+@section('title', 'Keranjang Belanja')
+@section('page_title', 'Keranjang Belanja')
+@section('page_subtitle', 'Periksa produk pilihan Anda sebelum checkout.')
 
-        @if (session('success'))
-            <p class="success-message">{{ session('success') }}</p>
-        @endif
+@section('content')
+<div class="shop-page">
 
-        @if (session('error'))
-            <p class="error-message">{{ session('error') }}</p>
-        @endif
+    {{-- Pesan sukses/error ditampilkan otomatis oleh layout --}}
+
+    <div class="shop-toolbar">
+        <a href="{{ route('user.products.index') }}" class="shop-btn shop-btn--ghost">
+            &larr; Kembali ke produk
+        </a>
 
         @if (count($items) > 0)
-            <div class="table-container">
-                <table>
+            <span class="shop-hint">{{ count($items) }} produk di keranjang</span>
+        @endif
+    </div>
+
+    @if (count($items) > 0)
+
+        <div class="shop-layout">
+
+            {{-- ===== Daftar produk di keranjang ===== --}}
+            <div class="shop-table-wrap">
+                <table class="shop-table">
+
                     <thead>
                         <tr>
                             <th>Produk</th>
-                            <th>Harga</th>
+                            <th class="is-num">Harga</th>
                             <th>Jumlah</th>
-                            <th>Subtotal</th>
+                            <th class="is-num">Subtotal</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    
-                    <tbody>
-                        @forelse ($items as $item)
-                            <tr>
-                                <td>{{ $item['product']->name }}</td>
 
-                                <td>
+                    <tbody>
+                        @foreach ($items as $item)
+                            <tr>
+                                <td><span class="shop-product">{{ $item['product']->name }}</span></td>
+
+                                <td class="is-num">
                                     Rp {{ number_format($item['product']->selling_price, 0, ',', '.') }}
                                 </td>
 
                                 <td>
                                     <form action="{{ route('user.cart.update', $item['product']) }}"
-                                        method="POST">
+                                          method="POST"
+                                          class="shop-qty">
                                         @csrf
                                         @method('PATCH')
 
                                         <input type="number"
-                                            name="quantity"
-                                            min="1"
-                                            max="{{ $item['product']->stock }}"
-                                            value="{{ $item['quantity'] }}"
-                                            required>
+                                               name="quantity"
+                                               min="1"
+                                               max="{{ $item['product']->stock }}"
+                                               value="{{ $item['quantity'] }}"
+                                               required>
 
-                                        <button type="submit" class="btn">
+                                        <button type="submit" class="shop-btn shop-btn--ghost shop-btn--small">
                                             Perbarui
                                         </button>
                                     </form>
                                 </td>
 
-                                <td>
-                                    Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
+                                <td class="is-num">
+                                    <strong>Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</strong>
                                 </td>
 
                                 <td>
                                     <form action="{{ route('user.cart.remove', $item['product']) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Hapus produk ini dari keranjang?')">
+                                          method="POST"
+                                          onsubmit="return confirm('Hapus produk ini dari keranjang?')">
                                         @csrf
                                         @method('DELETE')
 
-                                        <button type="submit" class="btn">
+                                        <button type="submit" class="shop-btn shop-btn--danger shop-btn--small">
                                             Hapus
                                         </button>
                                     </form>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" style="text-align: center;">
-                                    Keranjang belanja masih kosong.
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
+
                 </table>
             </div>
 
-            <section class="dashboard-card">
-                <h2>Total Belanja</h2>
-                <h3>Rp {{ number_format($total, 0, ',', '.') }}</h3>
+            {{-- ===== Ringkasan ===== --}}
+            <aside class="shop-summary">
+                <h2>Total belanja</h2>
+                <strong class="shop-total">Rp {{ number_format($total, 0, ',', '.') }}</strong>
                 <p>Biaya pengiriman belum dihitung.</p>
-                <a href="{{ route('user.checkout.index') }}" class="btn">
-                    Lanjut ke Checkout
+
+                <a href="{{ route('user.checkout.index') }}" class="shop-btn shop-btn--block">
+                    Lanjut ke checkout
                 </a>
-            </section>
-        @else
-            <section class="dashboard-card">
-                <p>Keranjang kamu masih kosong.</p>
-                <a href="{{ route('user.products.index') }}" class="btn">
-                    Mulai Belanja
-                </a>
-            </section>
-        @endif
-    </main>
-</body>
-</html>
+            </aside>
+
+        </div>
+
+    @else
+
+        <div class="shop-card shop-empty">
+            <p>Keranjang Anda masih kosong.</p>
+            <a href="{{ route('user.products.index') }}" class="shop-btn">Mulai belanja</a>
+        </div>
+
+    @endif
+
+</div>
+@endsection

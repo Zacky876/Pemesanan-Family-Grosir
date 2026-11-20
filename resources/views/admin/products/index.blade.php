@@ -95,7 +95,13 @@
                             <td>{{ $product->category->name ?? '-' }}</td>
                             <td>Rp {{ number_format($product->purchase_price, 0, ',', '.') }}</td>
                             <td>Rp {{ number_format($product->selling_price, 0, ',', '.') }}</td>
-                            <td>{{ $product->stock }} {{ $product->unit }}</td>
+
+                            <td>
+                                {{ $product->stock }} {{ $product->unit }}
+                                @if ($product->stock <= 10)
+                                    <span class="product-badge product-badge--low">Menipis</span>
+                                @endif
+                            </td>
 
                             <td>
                                 @if ($product->status == 'active')
