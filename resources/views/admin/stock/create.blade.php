@@ -1,130 +1,105 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('admin.layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Ubah Stok')
+@section('page_title', 'Ubah Stok')
+@section('page_subtitle', $product->name)
 
-    <title>Ubah Stok</title>
+@push('styles')
+    @vite('resources/css/admin/stock.css')
+@endpush
 
-    @vite(['resources/css/admin/admin.css'])
-</head>
+@section('content')
+<div class="stock-page">
 
-<body>
-
-<div class="dashboard-container">
-
-    <div class="dashboard-header">
-
-        <div>
-            <h1>Ubah Stok</h1>
-
-            <p>
-                {{ $product->name }}
-            </p>
-        </div>
-
-        <a
-            href="{{ route('admin.stock.index') }}"
-            class="btn">
+    <div class="stock-toolbar">
+        <a href="{{ route('admin.stock.index') }}" class="stock-btn stock-btn--ghost">
             Kembali
         </a>
+    </div>
+
+    {{-- Pesan error global sudah ditampilkan otomatis oleh layout --}}
+
+    {{-- ===== Ringkasan stok ===== --}}
+    <div class="stock-summary">
+
+        <div class="stock-tile">
+            <span>Produk</span>
+            <strong>{{ $product->name }}</strong>
+        </div>
+
+        <div class="stock-tile">
+            <span>Stok saat ini</span>
+            <strong>{{ $product->stock }} {{ $product->unit }}</strong>
+        </div>
+
+        <div class="stock-tile stock-tile--accent">
+            <span>Stok setelah perubahan</span>
+            <strong id="stockAfter">-</strong>
+        </div>
 
     </div>
 
-    @if($errors->any())
+    {{-- ===== Form ===== --}}
+    <form action="{{ route('admin.stock.store', $product) }}"
+          method="POST"
+          id="stockForm"
+          data-current="{{ $product->stock }}"
+          data-unit="{{ $product->unit }}"
+          class="stock-card stock-form">
 
-        <div class="error-message">
+        @csrf
 
-            <strong>Terjadi kesalahan:</strong>
+        <div class="stock-section">
+            <h2>Perubahan stok</h2>
+            <p>Catat stok masuk, stok keluar, atau penyesuaian hasil stok opname.</p>
 
-            <ul>
+            <div class="stock-grid">
 
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
+                <div class="stock-field">
+                    <label for="type">Jenis perubahan <span class="req">*</span></label>
+                    <select name="type" id="type"
+                            class="@error('type') is-invalid @enderror" required>
+                        <option value="in" {{ old('type') == 'in' ? 'selected' : '' }}>Stok masuk</option>
+                        <option value="out" {{ old('type') == 'out' ? 'selected' : '' }}>Stok keluar</option>
+                        <option value="adjustment" {{ old('type') == 'adjustment' ? 'selected' : '' }}>Penyesuaian stok</option>
+                    </select>
+                    @error('type') <span class="stock-error">{{ $message }}</span> @enderror
+                </div>
 
-            </ul>
+                <div class="stock-field">
+                    <label for="quantity">Jumlah ({{ $product->unit }}) <span class="req">*</span></label>
+                    <input type="number" name="quantity" id="quantity"
+                           min="0" value="{{ old('quantity') }}"
+                           class="@error('quantity') is-invalid @enderror" required>
+                    <span class="stock-hint" id="quantityHint">
+                        Untuk stok masuk/keluar, isi jumlah perubahan.
+                        Untuk penyesuaian, isi jumlah stok fisik terbaru.
+                    </span>
+                    @error('quantity') <span class="stock-error">{{ $message }}</span> @enderror
+                </div>
 
+                <div class="stock-field is-full">
+                    <label for="reason">Alasan / keterangan <span class="req">*</span></label>
+                    <textarea name="reason" id="reason" rows="4"
+                              class="@error('reason') is-invalid @enderror"
+                              placeholder="Contoh: Restock supplier atau hasil stok opname"
+                              required>{{ old('reason') }}</textarea>
+                    @error('reason') <span class="stock-error">{{ $message }}</span> @enderror
+                </div>
+
+            </div>
         </div>
 
-    @endif
-
-    <div class="dashboard-card">
-
-        <div style="margin-bottom: 20px;">
-
-            <strong>Stok Saat Ini:</strong>
-
-            {{ $product->stock }}
-            {{ $product->unit }}
-
+        <div class="stock-actions">
+            <a href="{{ route('admin.stock.index') }}" class="stock-btn stock-btn--ghost">Batal</a>
+            <button type="submit" class="stock-btn">Simpan perubahan</button>
         </div>
 
-        <form
-            action="{{ route('admin.stock.store', $product) }}"
-            method="POST">
-
-            @csrf
-
-            <div class="form-group">
-                <label for="type">Jenis Perubahan</label>
-
-                <select name="type" id="type" required>
-                    <option value="in" {{ old('type') == 'in' ? 'selected' : '' }}>
-                        Stok Masuk
-                    </option>
-
-                    <option value="out" {{ old('type') == 'out' ? 'selected' : '' }}>
-                        Stok Keluar
-                    </option>
-
-                    <option value="adjustment" {{ old('type') == 'adjustment' ? 'selected' : '' }}>
-                        Penyesuaian Stok
-                    </option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="quantity">Jumlah</label>
-
-                <input
-                    type="number"
-                    name="quantity"
-                    id="quantity"
-                    min="0"
-                    value="{{ old('quantity') }}"
-                    required>
-
-                <small>
-                    Untuk stok masuk/keluar, isi jumlah perubahan.
-                    Untuk penyesuaian, isi jumlah stok fisik terbaru.
-                </small>
-            </div>
-
-            <div class="form-group">
-                <label for="reason">Alasan / Keterangan</label>
-
-                <textarea
-                    name="reason"
-                    id="reason"
-                    rows="4"
-                    placeholder="Contoh: Restock supplier atau hasil stok opname"
-                    required>{{ old('reason') }}</textarea>
-            </div>
-
-            <button type="submit">Simpan Perubahan</button>
-
-            <a href="{{ route('admin.stock.index') }}" class="btn">
-                Batal
-            </a>
-
-        </form>
-
-    </div>
+    </form>
 
 </div>
+@endsection
 
-</body>
-
-</html>
+@push('scripts')
+    @vite('resources/js/admin/stock.js')
+@endpush
