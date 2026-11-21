@@ -1,103 +1,138 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Stok</title>
+@extends('admin.layouts.app')
 
-    @vite(['resources/css/admin/reports.css'])
-</head>
-<body>
+@section('title', 'Laporan Stok')
+@section('page_title', 'Laporan Stok Produk')
+@section('page_subtitle', 'Menampilkan informasi ketersediaan stok seluruh produk YoungMart.')
 
-<div class="report-container">
+@push('styles')
+    @vite('resources/css/admin/reports.css')
+@endpush
 
-    <a href="{{ route('admin.reports.index') }}">← Kembali ke Laporan</a>
+@section('content')
+@php
+    // Hitung komposisi dari daftar produk supaya sama dengan status di tabel
+    $jumlahHabis   = $products->filter(fn ($p) => $p->stock <= 0)->count();
+    $jumlahMenipis = $products->filter(fn ($p) => $p->stock > 0 && $p->stock <= $p->minimum_stock)->count();
+    $jumlahAman    = $products->count() - $jumlahHabis - $jumlahMenipis;
+    $semua         = max(1, $products->count());
+@endphp
 
-    <h2>Laporan Stok Produk</h2>
-    <p>Menampilkan informasi ketersediaan stok seluruh produk YoungMart.</p>
+<div class="report-page">
 
-    {{-- Ringkasan Stok --}}
-    <div class="report-grid">
+    <div class="report-toolbar">
+        <a href="{{ route('admin.reports.index') }}" class="report-btn report-btn--ghost">
+            &larr; Kembali ke laporan
+        </a>
 
-        <div class="report-card">
-            <h3>Total Produk</h3>
-            <h2>{{ $totalProducts }}</h2>
+        <div class="report-toolbar-actions">
+            <a href="{{ route('admin.stock.index') }}" class="report-btn report-btn--ghost">Kelola stok</a>
+            <button type="button" class="report-btn" onclick="window.print()">Cetak</button>
+        </div>
+    </div>
+
+    {{-- ===== Ringkasan stok ===== --}}
+    <div class="report-summary">
+
+        <div class="report-tile report-tile--accent">
+            <span>Total produk</span>
+            <strong>{{ $totalProducts }}</strong>
         </div>
 
-        <div class="report-card">
-            <h3>Stok Tersedia</h3>
-            <h2>{{ $availableProducts }}</h2>
+        <div class="report-tile report-tile--ok">
+            <span>Stok tersedia</span>
+            <strong>{{ $availableProducts }}</strong>
         </div>
 
-        <div class="report-card">
-            <h3>Stok Menipis</h3>
-            <h2>{{ $lowStockProducts }}</h2>
+        <div class="report-tile report-tile--low">
+            <span>Stok menipis</span>
+            <strong>{{ $lowStockProducts }}</strong>
         </div>
 
-        <div class="report-card">
-            <h3>Stok Habis</h3>
-            <h2>{{ $outOfStockProducts }}</h2>
+        <div class="report-tile report-tile--out">
+            <span>Stok habis</span>
+            <strong>{{ $outOfStockProducts }}</strong>
         </div>
 
     </div>
 
-    {{-- Tabel Stok Produk --}}
-    <h3>Daftar Stok Produk</h3>
+    {{-- ===== Komposisi stok ===== --}}
+    @if ($products->count() > 0)
+        <section class="report-card report-compose">
+            <h2>Komposisi stok produk</h2>
 
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Kode Produk</th>
-                    <th>Nama Produk</th>
-                    <th>Kategori</th>
-                    <th>Stok</th>
-                    <th>Stok Minimum</th>
-                    <th>Satuan</th>
-                    <th>Status Stok</th>
-                </tr>
-            </thead>
+            <div class="report-compose-bar" role="img"
+                 aria-label="Aman {{ $jumlahAman }}, menipis {{ $jumlahMenipis }}, habis {{ $jumlahHabis }}">
+                <i class="is-ok"  style="width: {{ $jumlahAman / $semua * 100 }}%"></i>
+                <i class="is-low" style="width: {{ $jumlahMenipis / $semua * 100 }}%"></i>
+                <i class="is-out" style="width: {{ $jumlahHabis / $semua * 100 }}%"></i>
+            </div>
 
-            <tbody>
-                @forelse ($products as $index => $product)
+            <div class="report-legend">
+                <span><i class="is-ok"></i>Tersedia <b>{{ $jumlahAman }}</b></span>
+                <span><i class="is-low"></i>Menipis <b>{{ $jumlahMenipis }}</b></span>
+                <span><i class="is-out"></i>Habis <b>{{ $jumlahHabis }}</b></span>
+            </div>
+        </section>
+    @endif
+
+    {{-- ===== Tabel stok produk ===== --}}
+    <section class="report-card report-section">
+        <div class="report-section-head">
+            <h2>Daftar stok produk</h2>
+            <p>Produk dengan stok menipis atau habis ditandai warna.</p>
+        </div>
+
+        <div class="report-table-wrap">
+            <table class="report-table report-table--wide">
+                <thead>
                     <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $product->code }}</td>
-                        <td>{{ $product->name }}</td>
-                        <td>{{ $product->category->name ?? '-' }}</td>
-                        <td>{{ $product->stock }}</td>
-                        <td>{{ $product->minimum_stock }}</td>
-                        <td>{{ $product->unit }}</td>
+                        <th>No</th>
+                        <th>Kode produk</th>
+                        <th>Nama produk</th>
+                        <th>Kategori</th>
+                        <th class="is-num">Stok</th>
+                        <th class="is-num">Stok minimum</th>
+                        <th>Satuan</th>
+                        <th>Status stok</th>
+                    </tr>
+                </thead>
 
-                        <td>
-                            @if ($product->stock <= 0)
-                                <span class="stock-status out">
-                                    Stok Habis
-                                </span>
-                            @elseif ($product->stock <= $product->minimum_stock)
-                                <span class="stock-status low">
-                                    Stok Menipis
-                                </span>
-                            @else
-                                <span class="stock-status available">
-                                    Tersedia
-                                </span>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8" class="empty-data">
-                            Belum ada data produk.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                <tbody>
+                    @forelse ($products as $index => $product)
+                        @php
+                            $kelasBaris = $product->stock <= 0
+                                ? 'is-out'
+                                : ($product->stock <= $product->minimum_stock ? 'is-low' : '');
+                        @endphp
+
+                        <tr class="{{ $kelasBaris }}">
+                            <td>{{ $index + 1 }}</td>
+                            <td><span class="report-code">{{ $product->code }}</span></td>
+                            <td><strong>{{ $product->name }}</strong></td>
+                            <td>{{ $product->category->name ?? '-' }}</td>
+                            <td class="is-num"><strong>{{ $product->stock }}</strong></td>
+                            <td class="is-num">{{ $product->minimum_stock }}</td>
+                            <td>{{ $product->unit }}</td>
+
+                            <td>
+                                @if ($product->stock <= 0)
+                                    <span class="report-badge report-badge--out">Stok habis</span>
+                                @elseif ($product->stock <= $product->minimum_stock)
+                                    <span class="report-badge report-badge--low">Stok menipis</span>
+                                @else
+                                    <span class="report-badge report-badge--ok">Tersedia</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="report-empty">Belum ada data produk.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
 
 </div>
-
-</body>
-</html>
+@endsection

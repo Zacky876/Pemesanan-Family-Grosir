@@ -1,96 +1,146 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Transaksi</title>
+@extends('admin.layouts.app')
 
-    @vite(['resources/css/admin/transactions.css'])
-</head>
-<body>
+@section('title', 'Detail Transaksi')
+@section('page_title', 'Detail Transaksi')
+@section('page_subtitle', $transaction->transaction_code)
 
-<div class="transaction-container">
+@push('styles')
+    @vite('resources/css/admin/transactions.css')
+@endpush
 
-    <h2>Detail Transaksi</h2>
+@section('content')
+@php
+    // Lencana status transaksi
+    $statusMap = [
+        'completed' => ['Selesai', 'success'],
+        'pending'   => ['Menunggu', 'warning'],
+        'cancelled' => ['Dibatalkan', 'danger'],
+    ];
+    [$statusLabel, $statusBadge] = $statusMap[$transaction->status]
+        ?? [ucfirst($transaction->status), 'muted'];
 
-    <p>
-        <strong>Kode Transaksi:</strong>
-        {{ $transaction->transaction_code }}
-    </p>
+    // Lencana status pembayaran (nilai disesuaikan dengan data yang umum dipakai)
+    $paymentStatus = strtolower($transaction->payment_status ?? '');
+    $paymentBadge = match (true) {
+        in_array($paymentStatus, ['paid', 'lunas', 'success', 'settlement', 'completed']) => 'success',
+        in_array($paymentStatus, ['pending', 'unpaid', 'waiting']) => 'warning',
+        in_array($paymentStatus, ['failed', 'cancelled', 'expired', 'rejected']) => 'danger',
+        default => 'muted',
+    };
+@endphp
 
-    <p>
-        <strong>Tanggal:</strong>
-        {{ $transaction->transaction_date->format('d-m-Y H:i') }}
-    </p>
+<div class="transaction-page">
 
-    <p>
-        <strong>Kasir:</strong>
-        {{ $transaction->user->name }}
-    </p>
+    <div class="transaction-toolbar">
+        <a href="{{ route('admin.transactions.index') }}" class="transaction-btn transaction-btn--ghost">
+            Kembali
+        </a>
 
-    <p>
-        <strong>Metode Pembayaran:</strong>
-        {{ strtoupper($transaction->payment_method ?? '-') }}
-    </p>
+        <button type="button" class="transaction-btn" onclick="window.print()">
+            Cetak
+        </button>
+    </div>
 
-    <p>
-        <strong>Status Transaksi:</strong>
-        {{ ucfirst($transaction->status) }}
-    </p>
+    {{-- ===== Ringkasan pembayaran ===== --}}
+    <div class="transaction-summary">
 
-    <p>
-        <strong>Status Pembayaran:</strong>
-        {{ ucfirst($transaction->payment_status ?? '-') }}
-    </p>
+        <div class="transaction-tile transaction-tile--accent">
+            <span>Total belanja</span>
+            <strong>Rp {{ number_format($transaction->total, 0, ',', '.') }}</strong>
+        </div>
 
-    <h3>Daftar Produk</h3>
+        <div class="transaction-tile">
+            <span>Uang dibayarkan</span>
+            <strong>Rp {{ number_format($transaction->payment, 0, ',', '.') }}</strong>
+        </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Produk</th>
-                <th>Harga</th>
-                <th>Jumlah</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
+        <div class="transaction-tile">
+            <span>Kembalian</span>
+            <strong>Rp {{ number_format($transaction->change_amount, 0, ',', '.') }}</strong>
+        </div>
 
-        <tbody>
-            @foreach ($transaction->details as $detail)
-                <tr>
-                    <td>{{ $detail->product->name }}</td>
-                    <td>
-                        Rp{{ number_format($detail->price, 0, ',', '.') }}
-                    </td>
-                    <td>{{ $detail->quantity }}</td>
-                    <td>
-                        Rp{{ number_format($detail->subtotal, 0, ',', '.') }}
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    </div>
 
-    <h3>
-        Total:
-        Rp{{ number_format($transaction->total, 0, ',', '.') }}
-    </h3>
+    {{-- ===== Informasi transaksi ===== --}}
+    <div class="transaction-card transaction-section">
+        <h2>Informasi transaksi</h2>
 
-    <p>
-        <strong>Uang Dibayarkan:</strong>
-        Rp{{ number_format($transaction->payment, 0, ',', '.') }}
-    </p>
+        <dl class="transaction-dl">
+            <div>
+                <dt>Kode transaksi</dt>
+                <dd><span class="transaction-code">{{ $transaction->transaction_code }}</span></dd>
+            </div>
 
-    <p>
-        <strong>Kembalian:</strong>
-        Rp{{ number_format($transaction->change_amount, 0, ',', '.') }}
-    </p>
+            <div>
+                <dt>Tanggal</dt>
+                <dd>{{ $transaction->transaction_date->format('d-m-Y H:i') }}</dd>
+            </div>
 
-    <a href="{{ route('admin.transactions.index') }}">
-        Kembali ke Riwayat Transaksi
-    </a>
+            <div>
+                <dt>Kasir</dt>
+                <dd>{{ $transaction->user->name ?? '-' }}</dd>
+            </div>
+
+            <div>
+                <dt>Metode pembayaran</dt>
+                <dd>{{ strtoupper($transaction->payment_method ?? '-') }}</dd>
+            </div>
+
+            <div>
+                <dt>Status transaksi</dt>
+                <dd><span class="transaction-badge transaction-badge--{{ $statusBadge }}">{{ $statusLabel }}</span></dd>
+            </div>
+
+            <div>
+                <dt>Status pembayaran</dt>
+                <dd>
+                    <span class="transaction-badge transaction-badge--{{ $paymentBadge }}">
+                        {{ ucfirst($transaction->payment_status ?? '-') }}
+                    </span>
+                </dd>
+            </div>
+        </dl>
+    </div>
+
+    {{-- ===== Daftar produk ===== --}}
+    <div class="transaction-card transaction-items">
+        <h2>Daftar produk</h2>
+
+        <div class="transaction-table-wrap">
+            <table class="transaction-table">
+
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Produk</th>
+                        <th class="is-num">Harga</th>
+                        <th class="is-num">Jumlah</th>
+                        <th class="is-num">Subtotal</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach ($transaction->details as $detail)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td><strong>{{ $detail->product->name ?? '-' }}</strong></td>
+                            <td class="is-num">Rp {{ number_format($detail->price, 0, ',', '.') }}</td>
+                            <td class="is-num">{{ $detail->quantity }}</td>
+                            <td class="is-num">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="is-num">Total</td>
+                        <td class="is-num">Rp {{ number_format($transaction->total, 0, ',', '.') }}</td>
+                    </tr>
+                </tfoot>
+
+            </table>
+        </div>
+    </div>
 
 </div>
-
-</body>
-</html>
+@endsection

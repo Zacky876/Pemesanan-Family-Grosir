@@ -1,131 +1,120 @@
+@extends('admin.layouts.app')
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Pelanggan</title>
-    
-    @vite(['resources/css/admin/admin.css'])
-</head>
-<body>
-    <div class="dashboard-container">
-        <div class="dashboard-header">
-            <div>
-                <h1>Manajemen Pelanggan</h1>
-                <p>Daftar akun pelanggan minimarket.</p>
-            </div>
+@section('title', 'Manajemen Pelanggan')
+@section('page_title', 'Manajemen Pelanggan')
+@section('page_subtitle', 'Daftar akun pelanggan minimarket.')
 
-            <a href="{{ route('admin.customers.create') }}" class="btn">
-                Tambah Pelanggan
-            </a>
+@push('styles')
+    @vite('resources/css/admin/customers.css')
+@endpush
+
+@section('content')
+<div class="customer-page">
+
+    {{-- Pesan sukses/error ditampilkan otomatis oleh layout --}}
+
+    <div class="customer-toolbar">
+        <span class="customer-hint">
+            {{ $customers->total() }} pelanggan
+        </span>
+
+        <a href="{{ route('admin.customers.create') }}" class="customer-btn">
+            + Tambah pelanggan
+        </a>
+    </div>
+
+    {{-- ===== Pencarian ===== --}}
+    <form action="{{ route('admin.customers.index') }}" method="GET"
+          class="customer-card customer-filter">
+
+        <div class="customer-field">
+            <label for="search">Cari pelanggan</label>
+            <input type="text" id="search" name="search"
+                   value="{{ request('search') }}"
+                   placeholder="Cari nama atau email pelanggan">
         </div>
 
-        <p>
-            <a href="{{ route('admin.dashboard') }}">Kembali ke Dashboard</a>
-        </p>
+        <div class="customer-filter-actions">
+            <button type="submit" class="customer-btn">Cari</button>
+            <a href="{{ route('admin.customers.index') }}"
+               class="customer-btn customer-btn--ghost">Reset</a>
+        </div>
 
-        @if (session('success'))
-            <div class="success-message">
-                {{ session('success') }}
-            </div>
-        @endif
+    </form>
 
-        @if ($errors->any())
-            <div class="error-message">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    {{-- ===== Tabel pelanggan ===== --}}
+    <div class="customer-table-wrap">
+        <table class="customer-table">
 
-        <div class="dashboard-card">
-            <form action="{{ route('admin.customers.index') }}"
-                  method="GET"
-                  style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
 
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Cari nama atau email pelanggan..."
-                >
-
-                <button type="submit">Cari</button>
-
-                <a href="{{ route('admin.customers.index') }}" class="btn">
-                    Reset
-                </a>
-            </form>
-
-            <table>
-                <thead>
+            <tbody>
+                @forelse ($customers as $customer)
                     <tr>
-                        <th>No.</th>
-                        <th>Nama</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
+                        <td>{{ $customers->firstItem() + $loop->index }}</td>
 
-                <tbody>
-                    @forelse ($customers as $customer)
-                        <tr>
-                            <td>
-                                {{ $customers->firstItem() + $loop->index }}
-                            </td>
+                        <td>
+                            <div class="customer-name">
+                                <span class="customer-avatar">{{ strtoupper(mb_substr($customer->name, 0, 1)) }}</span>
+                                {{ $customer->name }}
+                            </div>
+                        </td>
 
-                            <td>{{ $customer->name }}</td>
+                        <td>{{ $customer->email }}</td>
 
-                            <td>{{ $customer->email }}</td>
+                        <td>
+                            @if ($customer->is_active)
+                                <span class="customer-badge customer-badge--active">Aktif</span>
+                            @else
+                                <span class="customer-badge customer-badge--inactive">Nonaktif</span>
+                            @endif
+                        </td>
 
-                            <td>
-                                {{ $customer->is_active ? 'Aktif' : 'Nonaktif' }}
-                            </td>
+                        <td>
+                            <div class="customer-row-actions">
+                                <a href="{{ route('admin.customers.show', $customer) }}"
+                                   class="customer-btn customer-btn--ghost customer-btn--small">Detail</a>
 
-                            <td>
-                                <a href="{{ route('admin.customers.show', $customer) }}">
-                                    Detail
-                                </a>
+                                <a href="{{ route('admin.customers.edit', $customer) }}"
+                                   class="customer-btn customer-btn--ghost customer-btn--small">Edit</a>
 
-                                |
-
-                                <a href="{{ route('admin.customers.edit', $customer) }}">
-                                    Edit
-                                </a>
-
-                                <form
-                                    action="{{ route('admin.customers.toggle-status', $customer) }}"
-                                    method="POST"
-                                    style="display: inline;"
-                                    onsubmit="return confirm('Yakin ingin mengubah status pelanggan ini?')"
-                                >
+                                <form action="{{ route('admin.customers.toggle-status', $customer) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('Yakin ingin mengubah status pelanggan ini?')">
                                     @csrf
                                     @method('PATCH')
 
-                                    <button type="submit">
+                                    <button type="submit"
+                                            class="customer-btn customer-btn--small {{ $customer->is_active ? 'customer-btn--danger' : 'customer-btn--success' }}">
                                         {{ $customer->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                     </button>
                                 </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5">
-                                Tidak ada data pelanggan.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="customer-empty">Tidak ada data pelanggan.</td>
+                    </tr>
+                @endforelse
+            </tbody>
 
-            <div style="margin-top: 20px;">
-                {{ $customers->links() }}
-            </div>
-        </div>
+        </table>
     </div>
-</body>
-</html>
+
+    @if ($customers->hasPages())
+        <div class="customer-pagination">
+            {{ $customers->withQueryString()->links('pagination::default') }}
+        </div>
+    @endif
+
+</div>
+@endsection

@@ -1,153 +1,147 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Transaksi</title>
+@extends('admin.layouts.app')
 
-    @vite(['resources/css/admin/transactions.css'])
-</head>
-<body>
+@section('title', 'Riwayat Transaksi')
+@section('page_title', 'Riwayat Transaksi')
+@section('page_subtitle', 'Pantau semua transaksi penjualan minimarket.')
 
-<div class="transaction-container">
+@push('styles')
+    @vite('resources/css/admin/transactions.css')
+@endpush
 
-    <h2>Riwayat Transaksi</h2>
+@section('content')
+@php
+    // Label dan warna lencana untuk tiap status transaksi
+    $statusMap = [
+        'completed' => ['Selesai', 'success'],
+        'pending'   => ['Menunggu', 'warning'],
+        'cancelled' => ['Dibatalkan', 'danger'],
+    ];
+@endphp
 
-    <form action="{{ route('admin.transactions.index') }}" method="GET" class="filter-form">
+<div class="transaction-page">
 
-        <!-- Pencarian Transaksi -->
-        <div class="filter-group">
-            <label for="search">Cari Transaksi</label>
+    {{-- Pesan sukses/error ditampilkan otomatis oleh layout --}}
 
-            <input type="text" id="search" name="search" placeholder="Cari kode transaksi..."value="{{ request('search') }}">
+    <div class="transaction-toolbar">
+        <span class="transaction-hint">
+            {{ $transactions->total() }} transaksi ditemukan
+        </span>
+    </div>
+
+    {{-- ===== Cari dan filter ===== --}}
+    <form action="{{ route('admin.transactions.index') }}" method="GET"
+          class="transaction-card transaction-filter">
+
+        <div class="transaction-field">
+            <label for="search">Cari transaksi</label>
+            <input type="text" id="search" name="search"
+                   placeholder="Cari kode transaksi"
+                   value="{{ request('search') }}">
         </div>
 
-        <!-- Tanggal Mulai -->
-        <div class="filter-group">
-            <label for="start_date">Tanggal Mulai</label>
-
-            <input type="date" id="start_date" name="start_date" value="{{ request('start_date') }}">
+        <div class="transaction-field">
+            <label for="start_date">Tanggal mulai</label>
+            <input type="date" id="start_date" name="start_date"
+                   value="{{ request('start_date') }}">
         </div>
 
-        <!-- Tanggal Akhir -->
-        <div class="filter-group">
-            <label for="end_date">Tanggal Akhir</label>
-
-            <input type="date" id="end_date" name="end_date" value="{{ request('end_date') }}">
+        <div class="transaction-field">
+            <label for="end_date">Tanggal akhir</label>
+            <input type="date" id="end_date" name="end_date"
+                   value="{{ request('end_date') }}">
         </div>
 
-        <!-- Filter Kasir -->
-        <div class="filter-group">
+        <div class="transaction-field">
             <label for="cashier">Kasir</label>
-
             <select name="cashier" id="cashier">
-                <option value="">Semua Kasir</option>
-
+                <option value="">Semua kasir</option>
                 @foreach ($cashiers as $cashier)
-                    <option value="{{ $cashier->id }}" {{ request('cashier') == $cashier->id ? 'selected' : '' }}>
+                    <option value="{{ $cashier->id }}"
+                        {{ request('cashier') == $cashier->id ? 'selected' : '' }}>
                         {{ $cashier->name }}
                     </option>
                 @endforeach
             </select>
         </div>
 
-        <!-- Filter Status -->
-        <div class="filter-group">
+        <div class="transaction-field">
             <label for="status">Status</label>
-
             <select name="status" id="status">
-                <option value="">Semua Status</option>
-
-                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>
-                    Completed
-                </option>
-
-                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>
-                    Pending
-                </option>
-
-                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>
-                    Cancelled
-                </option>
+                <option value="">Semua status</option>
+                @foreach ($statusMap as $value => [$label])
+                    <option value="{{ $value }}" {{ request('status') == $value ? 'selected' : '' }}>
+                        {{ $label }}
+                    </option>
+                @endforeach
             </select>
         </div>
 
-        <!-- Tombol Filter dan Reset -->
-        <div class="filter-actions">
-            <button type="submit" class="filter-button">
-                Filter
-            </button>
-
-            <a href="{{ route('admin.transactions.index') }}" class="reset-button">
-                Reset
-            </a>
+        <div class="transaction-filter-actions">
+            <button type="submit" class="transaction-btn">Filter</button>
+            <a href="{{ route('admin.transactions.index') }}"
+               class="transaction-btn transaction-btn--ghost">Reset</a>
         </div>
 
     </form>
 
-    <!-- Tabel Riwayat Transaksi -->
-    <table class="transaction-table">
+    {{-- ===== Tabel riwayat transaksi ===== --}}
+    <div class="transaction-table-wrap">
+        <table class="transaction-table">
 
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Kode Transaksi</th>
-                <th>Tanggal</th>
-                <th>Kasir</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @forelse ($transactions as $transaction)
+            <thead>
                 <tr>
-                    <td>
-                        {{ $transactions->firstItem() + $loop->index }}
-                    </td>
-
-                    <td>
-                        {{ $transaction->transaction_code }}
-                    </td>
-
-                    <td>
-                        {{ $transaction->transaction_date->format('d-m-Y H:i') }}
-                    </td>
-
-                    <td>
-                        {{ $transaction->user->name ?? '-' }}
-                    </td>
-
-                    <td>
-                        Rp{{ number_format($transaction->total, 0, ',', '.') }}
-                    </td>
-
-                    <td>
-                        {{ ucfirst($transaction->status) }}
-                    </td>
-
-                    <td>
-                        <a href="{{ route('admin.transactions.show', $transaction->id) }}" class="detail-link">
-                            Detail
-                        </a>
-                    </td>
+                    <th>No</th>
+                    <th>Kode transaksi</th>
+                    <th>Tanggal</th>
+                    <th>Kasir</th>
+                    <th class="is-num">Total</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
                 </tr>
+            </thead>
 
-            @empty
-                <tr>
-                    <td colspan="7" style="text-align: center;">
-                        Belum ada transaksi.
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
+            <tbody>
+                @forelse ($transactions as $transaction)
+                    @php
+                        [$label, $badge] = $statusMap[$transaction->status]
+                            ?? [ucfirst($transaction->status), 'muted'];
+                    @endphp
 
-    </table>
+                    <tr>
+                        <td>{{ $transactions->firstItem() + $loop->index }}</td>
 
-    {{ $transactions->links() }}
+                        <td><span class="transaction-code">{{ $transaction->transaction_code }}</span></td>
+
+                        <td>{{ $transaction->transaction_date->format('d-m-Y H:i') }}</td>
+
+                        <td>{{ $transaction->user->name ?? '-' }}</td>
+
+                        <td class="is-num"><strong>Rp {{ number_format($transaction->total, 0, ',', '.') }}</strong></td>
+
+                        <td>
+                            <span class="transaction-badge transaction-badge--{{ $badge }}">{{ $label }}</span>
+                        </td>
+
+                        <td>
+                            <a href="{{ route('admin.transactions.show', $transaction->id) }}"
+                               class="transaction-btn transaction-btn--ghost transaction-btn--small">Detail</a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="transaction-empty">Belum ada transaksi.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+
+        </table>
+    </div>
+
+    @if ($transactions->hasPages())
+        <div class="transaction-pagination">
+            {{ $transactions->withQueryString()->links('pagination::default') }}
+        </div>
+    @endif
 
 </div>
-
-</body>
-</html>
+@endsection

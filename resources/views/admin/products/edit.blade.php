@@ -39,6 +39,7 @@
                     <input type="text" id="code" name="code"
                            value="{{ old('code', $product->code) }}"
                            class="@error('code') is-invalid @enderror" @readonly(true) required>
+                    <span class="product-hint">Kode produk tidak dapat diubah.</span>
                     @error('code') <span class="product-error">{{ $message }}</span> @enderror
                 </div>
 

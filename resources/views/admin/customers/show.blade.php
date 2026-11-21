@@ -1,74 +1,116 @@
+@extends('admin.layouts.app')
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Pelanggan</title>
-    
-    @vite(['resources/css/admin/admin.css'])
-</head>
-<body>
-    <div class="dashboard-container">
-        <div class="dashboard-header">
-            <h1>Detail Pelanggan</h1>
+@section('title', 'Detail Pelanggan')
+@section('page_title', 'Detail Pelanggan')
+@section('page_subtitle', $customer->name)
 
-            <a href="{{ route('admin.customers.index') }}" class="btn">
-                Kembali
+@push('styles')
+    @vite('resources/css/admin/customers.css')
+@endpush
+
+@section('content')
+<div class="customer-page">
+
+    <div class="customer-toolbar">
+        <a href="{{ route('admin.customers.index') }}" class="customer-btn customer-btn--ghost">
+            Kembali
+        </a>
+
+        <div class="customer-toolbar-actions">
+            <form action="{{ route('admin.customers.toggle-status', $customer) }}"
+                  method="POST"
+                  onsubmit="return confirm('Yakin ingin mengubah status pelanggan ini?')">
+                @csrf
+                @method('PATCH')
+
+                <button type="submit"
+                        class="customer-btn {{ $customer->is_active ? 'customer-btn--danger' : 'customer-btn--success' }}">
+                    {{ $customer->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                </button>
+            </form>
+
+            <a href="{{ route('admin.customers.edit', $customer) }}" class="customer-btn">
+                Edit pelanggan
             </a>
         </div>
+    </div>
 
-        <div class="dashboard-card">
-            <table>
-                <tbody>
-                    <tr>
-                        <th>ID Pelanggan</th>
-                        <td>{{ $customer->id }}</td>
-                    </tr>
+    {{-- ===== Ringkasan ===== --}}
+    <div class="customer-summary">
 
-                    <tr>
-                        <th>Nama</th>
-                        <td>{{ $customer->name }}</td>
-                    </tr>
+        <div class="customer-tile customer-tile--accent">
+            <span>Status akun</span>
+            <strong>{{ $customer->is_active ? 'Aktif' : 'Nonaktif' }}</strong>
+        </div>
 
-                    <tr>
-                        <th>Email</th>
-                        <td>{{ $customer->email }}</td>
-                    </tr>
+        <div class="customer-tile">
+            <span>Terdaftar sejak</span>
+            <strong>{{ $customer->created_at?->format('d-m-Y') ?? '-' }}</strong>
+        </div>
 
-                    <tr>
-                        <th>Role</th>
-                        <td>{{ $customer->role }}</td>
-                    </tr>
+        <div class="customer-tile">
+            <span>Terakhir diperbarui</span>
+            <strong>{{ $customer->updated_at?->format('d-m-Y') ?? '-' }}</strong>
+        </div>
 
-                    <tr>
-                        <th>Status Akun</th>
-                        <td>
-                            {{ $customer->is_active ? 'Aktif' : 'Nonaktif' }}
-                        </td>
-                    </tr>
+    </div>
 
-                    <tr>
-                        <th>Tanggal Dibuat</th>
-                        <td>{{ $customer->created_at?->format('d-m-Y H:i') }}</td>
-                    </tr>
+    {{-- ===== Informasi pelanggan ===== --}}
+    <div class="customer-card">
 
-                    <tr>
-                        <th>Terakhir Diperbarui</th>
-                        <td>{{ $customer->updated_at?->format('d-m-Y H:i') }}</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="customer-profile">
+            <span class="customer-avatar customer-avatar--large">{{ strtoupper(mb_substr($customer->name, 0, 1)) }}</span>
 
-            <div style="margin-top: 20px;">
-                <a
-                    href="{{ route('admin.customers.edit', $customer) }}"
-                    class="btn"
-                >
-                    Edit Pelanggan
-                </a>
+            <div>
+                <h2>{{ $customer->name }}</h2>
+                <p>{{ $customer->email }}</p>
+
+                @if ($customer->is_active)
+                    <span class="customer-badge customer-badge--active">Aktif</span>
+                @else
+                    <span class="customer-badge customer-badge--inactive">Nonaktif</span>
+                @endif
             </div>
         </div>
+
+        <dl class="customer-dl">
+            <div>
+                <dt>ID pelanggan</dt>
+                <dd>{{ $customer->id }}</dd>
+            </div>
+
+            <div>
+                <dt>Nama</dt>
+                <dd>{{ $customer->name }}</dd>
+            </div>
+
+            <div>
+                <dt>Email</dt>
+                <dd>{{ $customer->email }}</dd>
+            </div>
+
+            <div>
+                <dt>Role</dt>
+                <dd>{{ ucfirst($customer->role) }}</dd>
+            </div>
+
+            <div>
+                <dt>Status akun</dt>
+                <dd>{{ $customer->is_active ? 'Aktif' : 'Nonaktif' }}</dd>
+            </div>
+
+            <div>
+                <dt>Tanggal dibuat</dt>
+                <dd>{{ $customer->created_at?->format('d-m-Y H:i') ?? '-' }}</dd>
+            </div>
+
+            <div>
+                <dt>Terakhir diperbarui</dt>
+                <dd>{{ $customer->updated_at?->format('d-m-Y H:i') ?? '-' }}</dd>
+            </div>
+        </dl>
+
     </div>
-</body>
-</html>
+
+</div>
+@endsection

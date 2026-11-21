@@ -1,32 +1,56 @@
+/* =========================================================
+   Riwayat pembelian pelanggan - tema biru Youngmart
+   Nama kelas sama dengan versi lama.
+   ========================================================= */
+
+:root {
+    --ut-navy-deep: #071a4d;
+    --ut-navy: #0c2a7a;
+    --ut-blue: #2347ff;
+    --ut-blue-dark: #1a36d1;
+    --ut-blue-50: #f3f6ff;
+    --ut-line: #e0e7fb;
+    --ut-text: #0e1a40;
+    --ut-muted: #5a6891;
+    --ut-radius: 20px;
+    --ut-shadow: 0 12px 32px -16px rgba(25, 55, 170, 0.28);
+}
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    background: #f5f5f5;
-    color: #222;
-    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #f5f8ff 0%, #e4ecff 55%, #d7e2ff 100%) fixed;
+    color: var(--ut-text);
+    font-family: 'Inter', system-ui, Arial, sans-serif;
 }
 
 .transaction-container {
     max-width: 1200px;
     margin: 30px auto;
-    padding: 25px;
-    background: white;
-    border-radius: 8px;
+    padding: 28px;
+    border: 1px solid var(--ut-line);
+    border-radius: var(--ut-radius);
+    background: #fff;
+    box-shadow: var(--ut-shadow);
 }
 
 .transaction-container h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
+    margin: 0 0 24px;
+    color: var(--ut-navy-deep);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
 }
 
 .filter-form {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 25px;
+    gap: 16px;
+    margin-bottom: 24px;
 }
 
 .filter-group {
@@ -43,10 +67,21 @@ body {
 .filter-group input,
 .filter-group select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 11px 14px;
+    border: 1px solid var(--ut-line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--ut-text);
+    font: inherit;
     font-size: 14px;
+    transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--ut-blue);
+    box-shadow: 0 0 0 4px rgba(35, 71, 255, 0.14);
 }
 
 .filter-actions {
@@ -57,22 +92,40 @@ body {
 
 .filter-button,
 .reset-button {
-    padding: 10px 18px;
-    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 20px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
     cursor: pointer;
-    font-size: 14px;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
 }
 
 .filter-button {
-    border: none;
-    background: #222;
-    color: white;
+    background: linear-gradient(135deg, #4a6bff, var(--ut-blue));
+    box-shadow: 0 10px 20px -10px rgba(35, 71, 255, 0.7);
+    color: #fff;
+}
+
+.filter-button:hover {
+    background: linear-gradient(135deg, var(--ut-blue), var(--ut-blue-dark));
 }
 
 .reset-button {
-    background: #ddd;
-    color: #222;
+    background: #fff;
+    border-color: var(--ut-line);
+    color: var(--ut-navy);
+}
+
+.reset-button:hover {
+    background: var(--ut-blue-50);
+    border-color: var(--ut-blue);
+    color: var(--ut-blue);
 }
 
 .transaction-table {
@@ -82,24 +135,37 @@ body {
 
 .transaction-table th,
 .transaction-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
+    padding: 14px 16px;
+    border: 0;
+    border-bottom: 1px solid var(--ut-line);
     text-align: left;
     font-size: 14px;
 }
 
 .transaction-table th {
-    background: #222;
-    color: white;
+    background: var(--ut-blue-50);
+    color: var(--ut-navy);
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
-.transaction-table tr:nth-child(even) {
-    background: #f8f8f8;
+.transaction-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.transaction-table tbody tr:hover {
+    background: #f6f9ff;
 }
 
 .detail-link {
-    color: #222;
-    font-weight: 600;
+    color: var(--ut-blue);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.detail-link:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 768px) {
@@ -109,7 +175,7 @@ body {
 
     .transaction-container {
         margin: 10px;
-        padding: 15px;
+        padding: 16px;
         overflow-x: auto;
     }
 }

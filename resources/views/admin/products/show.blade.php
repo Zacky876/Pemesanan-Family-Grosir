@@ -53,7 +53,12 @@
             <dd>Rp {{ number_format($product->selling_price, 0, ',', '.') }}</dd>
 
             <dt>Stok</dt>
-            <dd>{{ $product->stock }} {{ $product->unit }}</dd>
+            <dd>
+                {{ $product->stock }} {{ $product->unit }}
+                @if ($product->stock <= 10)
+                    <span class="product-badge product-badge--low">Menipis</span>
+                @endif
+            </dd>
 
             <dt>Satuan</dt>
             <dd>{{ $product->unit }}</dd>

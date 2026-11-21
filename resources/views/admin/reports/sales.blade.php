@@ -1,180 +1,202 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Penjualan</title>
+@extends('admin.layouts.app')
 
-    @vite(['resources/css/admin/reports.css'])
-</head>
-<body>
+@section('title', 'Laporan Penjualan')
+@section('page_title', 'Laporan Penjualan')
+@section('page_subtitle', 'Menampilkan ringkasan dan rincian penjualan YoungMart.')
 
-<div class="report-container">
+@push('styles')
+    @vite('resources/css/admin/reports.css')
+@endpush
 
-    <a href="{{ route('admin.reports.index') }}">← Kembali ke Laporan</a>
+@section('content')
+@php
+    $periodLabels = ['daily' => 'Harian', 'weekly' => 'Mingguan', 'monthly' => 'Bulanan'];
 
-    <h2>Laporan Penjualan</h2>
-    <p>Menampilkan ringkasan dan rincian penjualan YoungMart.</p>
+    // Nilai terbesar dipakai untuk panjang batang proporsi
+    $maxProduct  = max(1, (float) collect($productSales)->max('total_sales'));
+    $maxCategory = max(1, (float) collect($categorySales)->max('total_sales'));
+    $maxCashier  = max(1, (float) collect($cashierSales)->max('total_sales'));
+@endphp
 
-    {{-- Filter Periode --}}
-    <form action="{{ route('admin.reports.sales') }}" method="GET" class="filter-form">
+<div class="report-page">
 
-        <div>
-            <label for="period">Periode Laporan</label>
+    <div class="report-toolbar">
+        <a href="{{ route('admin.reports.index') }}" class="report-btn report-btn--ghost">
+            &larr; Kembali ke laporan
+        </a>
+
+        <div class="report-toolbar-actions">
+            <button type="button" class="report-btn" onclick="window.print()">Cetak</button>
+        </div>
+    </div>
+
+    {{-- ===== Filter periode ===== --}}
+    <form action="{{ route('admin.reports.sales') }}" method="GET"
+          class="report-card report-filter">
+
+        <div class="report-field">
+            <label for="period">Periode laporan</label>
             <select name="period" id="period">
-                <option value="daily" {{ $period == 'daily' ? 'selected' : '' }}>
-                    Harian
-                </option>
-
-                <option value="weekly" {{ $period == 'weekly' ? 'selected' : '' }}>
-                    Mingguan
-                </option>
-
-                <option value="monthly" {{ $period == 'monthly' ? 'selected' : '' }}>
-                    Bulanan
-                </option>
+                @foreach ($periodLabels as $value => $label)
+                    <option value="{{ $value }}" {{ $period == $value ? 'selected' : '' }}>
+                        {{ $label }}
+                    </option>
+                @endforeach
             </select>
         </div>
 
-        <div>
-            <label for="date">Tanggal Acuan</label>
+        <div class="report-field">
+            <label for="date">Tanggal acuan</label>
             <input type="date" name="date" id="date" value="{{ $date }}">
         </div>
 
-        <button type="submit">Tampilkan</button>
+        <button type="submit" class="report-btn">Tampilkan</button>
 
     </form>
 
-    {{-- Ringkasan Penjualan --}}
-    <h3>Ringkasan Penjualan</h3>
+    <span class="report-hint">
+        Laporan {{ strtolower($periodLabels[$period] ?? $period) }}
+        dengan tanggal acuan {{ \Illuminate\Support\Carbon::parse($date)->format('d-m-Y') }}
+    </span>
 
-    <div class="report-grid">
+    {{-- ===== Ringkasan penjualan ===== --}}
+    <div class="report-summary">
 
-        <div class="report-card">
-            <h3>Total Penjualan</h3>
-            <h2>Rp {{ number_format($totalSales, 0, ',', '.') }}</h2>
+        <div class="report-tile report-tile--accent">
+            <span>Total penjualan</span>
+            <strong>Rp {{ number_format($totalSales, 0, ',', '.') }}</strong>
         </div>
 
-        <div class="report-card">
-            <h3>Total Transaksi</h3>
-            <h2>{{ number_format($totalTransactions, 0, ',', '.') }}</h2>
+        <div class="report-tile">
+            <span>Total transaksi</span>
+            <strong>{{ number_format($totalTransactions, 0, ',', '.') }}</strong>
         </div>
 
-        <div class="report-card">
-            <h3>Produk Terjual</h3>
-            <h2>{{ number_format($totalProductsSold, 0, ',', '.') }}</h2>
+        <div class="report-tile">
+            <span>Produk terjual</span>
+            <strong>{{ number_format($totalProductsSold, 0, ',', '.') }}</strong>
         </div>
 
     </div>
 
-    {{-- Penjualan Berdasarkan Produk --}}
-    <h3>Penjualan Berdasarkan Produk</h3>
+    {{-- ===== Penjualan berdasarkan produk ===== --}}
+    <section class="report-card report-section">
+        <div class="report-section-head">
+            <h2>Penjualan berdasarkan produk</h2>
+            <p>Produk diurutkan sesuai data dari laporan.</p>
+        </div>
 
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Kode Produk</th>
-                    <th>Nama Produk</th>
-                    <th>Jumlah Terjual</th>
-                    <th>Total Penjualan</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @forelse ($productSales as $index => $product)
+        <div class="report-table-wrap">
+            <table class="report-table">
+                <thead>
                     <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $product->code }}</td>
-                        <td>{{ $product->name }}</td>
-                        <td>{{ $product->total_quantity }}</td>
-                        <td>
-                            Rp {{ number_format($product->total_sales, 0, ',', '.') }}
-                        </td>
+                        <th>No</th>
+                        <th>Kode produk</th>
+                        <th>Nama produk</th>
+                        <th class="is-num">Jumlah terjual</th>
+                        <th class="is-num">Total penjualan</th>
                     </tr>
-                @empty
+                </thead>
+
+                <tbody>
+                    @forelse ($productSales as $index => $product)
+                        <tr>
+                            <td><span class="report-rank">{{ $index + 1 }}</span></td>
+                            <td><span class="report-code">{{ $product->code }}</span></td>
+                            <td><strong>{{ $product->name }}</strong></td>
+                            <td class="is-num">{{ $product->total_quantity }}</td>
+                            <td class="is-bar">
+                                <span class="report-amount">Rp {{ number_format($product->total_sales, 0, ',', '.') }}</span>
+                                <span class="report-bar"><i style="width: {{ round($product->total_sales / $maxProduct * 100) }}%"></i></span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="report-empty">Belum ada data penjualan produk.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    {{-- ===== Penjualan berdasarkan kategori ===== --}}
+    <section class="report-card report-section">
+        <div class="report-section-head">
+            <h2>Penjualan berdasarkan kategori</h2>
+            <p>Perbandingan penjualan tiap kategori produk.</p>
+        </div>
+
+        <div class="report-table-wrap">
+            <table class="report-table">
+                <thead>
                     <tr>
-                        <td colspan="5" class="empty-data">
-                            Belum ada data penjualan produk.
-                        </td>
+                        <th>No</th>
+                        <th>Kategori</th>
+                        <th class="is-num">Jumlah terjual</th>
+                        <th class="is-num">Total penjualan</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                </thead>
 
-    {{-- Penjualan Berdasarkan Kategori --}}
-    <h3>Penjualan Berdasarkan Kategori</h3>
+                <tbody>
+                    @forelse ($categorySales as $index => $category)
+                        <tr>
+                            <td><span class="report-rank">{{ $index + 1 }}</span></td>
+                            <td><strong>{{ $category->category_name }}</strong></td>
+                            <td class="is-num">{{ $category->total_quantity }}</td>
+                            <td class="is-bar">
+                                <span class="report-amount">Rp {{ number_format($category->total_sales, 0, ',', '.') }}</span>
+                                <span class="report-bar"><i style="width: {{ round($category->total_sales / $maxCategory * 100) }}%"></i></span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="report-empty">Belum ada data penjualan kategori.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Kategori</th>
-                    <th>Jumlah Terjual</th>
-                    <th>Total Penjualan</th>
-                </tr>
-            </thead>
+    {{-- ===== Penjualan berdasarkan kasir ===== --}}
+    <section class="report-card report-section">
+        <div class="report-section-head">
+            <h2>Penjualan berdasarkan kasir</h2>
+            <p>Jumlah transaksi dan nilai penjualan tiap kasir.</p>
+        </div>
 
-            <tbody>
-                @forelse ($categorySales as $index => $category)
+        <div class="report-table-wrap">
+            <table class="report-table">
+                <thead>
                     <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $category->category_name }}</td>
-                        <td>{{ $category->total_quantity }}</td>
-                        <td>
-                            Rp {{ number_format($category->total_sales, 0, ',', '.') }}
-                        </td>
+                        <th>No</th>
+                        <th>Nama kasir</th>
+                        <th class="is-num">Jumlah transaksi</th>
+                        <th class="is-num">Total penjualan</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="empty-data">
-                            Belum ada data penjualan kategori.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                </thead>
 
-    {{-- Penjualan Berdasarkan Kasir --}}
-    <h3>Penjualan Berdasarkan Kasir</h3>
-
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Nama Kasir</th>
-                    <th>Jumlah Transaksi</th>
-                    <th>Total Penjualan</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @forelse ($cashierSales as $index => $cashier)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $cashier->cashier_name }}</td>
-                        <td>{{ $cashier->total_transactions }}</td>
-                        <td>
-                            Rp {{ number_format($cashier->total_sales, 0, ',', '.') }}
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="empty-data">
-                            Belum ada data penjualan kasir.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                <tbody>
+                    @forelse ($cashierSales as $index => $cashier)
+                        <tr>
+                            <td><span class="report-rank">{{ $index + 1 }}</span></td>
+                            <td><strong>{{ $cashier->cashier_name }}</strong></td>
+                            <td class="is-num">{{ $cashier->total_transactions }}</td>
+                            <td class="is-bar">
+                                <span class="report-amount">Rp {{ number_format($cashier->total_sales, 0, ',', '.') }}</span>
+                                <span class="report-bar"><i style="width: {{ round($cashier->total_sales / $maxCashier * 100) }}%"></i></span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="report-empty">Belum ada data penjualan kasir.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
 
 </div>
-
-</body>
-</html>
+@endsection

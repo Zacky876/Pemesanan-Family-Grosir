@@ -1,128 +1,119 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konfirmasi Checkout</title>
-    
-    @vite(['resources/css/user/user.css'])
-</head>
-<body>
-    <main class="dashboard-container">
-        <div class="dashboard-header">
-            <div>
-                <h1>Konfirmasi Checkout</h1>
-                <p>Periksa pesanan sebelum dikirim.</p>
+@extends('user.layout.app')
+
+@section('title', 'Konfirmasi Checkout')
+@section('page_title', 'Konfirmasi Checkout')
+@section('page_subtitle', 'Periksa pesanan sebelum dikirim.')
+
+@section('content')
+<div class="shop-page">
+
+    {{-- Pesan error ditampilkan otomatis oleh layout --}}
+
+    <div class="shop-toolbar">
+        <a href="{{ route('user.cart.index') }}" class="shop-btn shop-btn--ghost">
+            &larr; Kembali ke keranjang
+        </a>
+    </div>
+
+    <div class="shop-layout">
+
+        {{-- ===== Detail pesanan ===== --}}
+        <div class="shop-card">
+            <div class="shop-section" style="padding-bottom: 0;">
+                <h2>Detail pesanan</h2>
+                <p>Produk yang akan Anda pesan.</p>
             </div>
 
-            <a href="{{ route('user.cart.index') }}" class="btn">
-                Kembali ke Keranjang
-            </a>
-        </div>
+            <div class="shop-table-wrap" style="border: 0; border-radius: 0; box-shadow: none;">
+                <table class="shop-table">
 
-        @if ($errors->any())
-            <div class="error-message">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <section class="dashboard-card">
-            <h2>Detail Pesanan</h2>
-
-            <div class="table-container">
-                <table>
                     <thead>
                         <tr>
                             <th>Produk</th>
-                            <th>Harga</th>
-                            <th>Jumlah</th>
-                            <th>Subtotal</th>
+                            <th class="is-num">Harga</th>
+                            <th class="is-num">Jumlah</th>
+                            <th class="is-num">Subtotal</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @foreach ($items as $item)
                             <tr>
-                                <td>{{ $item['product']->name }}</td>
-                                <td>
+                                <td><span class="shop-product">{{ $item['product']->name }}</span></td>
+                                <td class="is-num">
                                     Rp {{ number_format($item['product']->selling_price, 0, ',', '.') }}
                                 </td>
-                                <td>{{ $item['quantity'] }}</td>
-                                <td>
+                                <td class="is-num">{{ $item['quantity'] }}</td>
+                                <td class="is-num">
                                     Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
+
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="is-num">Total</td>
+                            <td class="is-num">Rp {{ number_format($total, 0, ',', '.') }}</td>
+                        </tr>
+                    </tfoot>
+
                 </table>
             </div>
+        </div>
 
-            <h2>
-                Total: Rp {{ number_format($total, 0, ',', '.') }}
-            </h2>
+        {{-- ===== Metode pembayaran ===== --}}
+        <form action="{{ route('user.checkout.store') }}"
+              method="POST"
+              class="shop-card shop-section"
+              onsubmit="return confirm('Apakah kamu yakin ingin membuat pesanan ini?')">
+            @csrf
 
-            <hr>
-
-            <h2>Metode Pembayaran</h2>
+            <h2>Metode pembayaran</h2>
             <p>Pilih metode pembayaran untuk pesanan ini.</p>
 
-            <form
-                action="{{ route('user.checkout.store') }}"
-                method="POST"
-                onsubmit="return confirm('Apakah kamu yakin ingin membuat pesanan ini?')"
-            >
-                @csrf
+            <div class="shop-options">
 
-                <div>
-                    <label>
-                        <input
-                            type="radio"
-                            name="payment_method"
-                            value="qris"
-                            {{ old('payment_method', 'qris') === 'qris' ? 'checked' : '' }}
-                            required
-                        >
-                        **QRIS**
-                    </label>
-                    <p>
-                        Bayar menggunakan QRIS dan unggah bukti pembayaran
-                        untuk diperiksa admin atau kasir.
-                    </p>
-                </div>
+                <label class="shop-option">
+                    <input type="radio"
+                           name="payment_method"
+                           value="qris"
+                           {{ old('payment_method', 'qris') === 'qris' ? 'checked' : '' }}
+                           required>
+                    <div>
+                        <strong>QRIS</strong>
+                        <span>
+                            Bayar menggunakan QRIS dan unggah bukti pembayaran
+                            untuk diperiksa admin atau kasir.
+                        </span>
+                    </div>
+                </label>
 
-                <div>
-                    <label>
-                        <input
-                            type="radio"
-                            name="payment_method"
-                            value="cash"
-                            {{ old('payment_method') === 'cash' ? 'checked' : '' }}
-                            required
-                        >
-                        **Tunai di Kasir**
-                    </label>
-                    <p>
-                        Bayar langsung kepada kasir saat melakukan pembayaran.
-                    </p>
-                </div>
+                <label class="shop-option">
+                    <input type="radio"
+                           name="payment_method"
+                           value="cash"
+                           {{ old('payment_method') === 'cash' ? 'checked' : '' }}
+                           required>
+                    <div>
+                        <strong>Tunai di kasir</strong>
+                        <span>Bayar langsung kepada kasir saat melakukan pembayaran.</span>
+                    </div>
+                </label>
 
-                <hr>
+            </div>
 
-                <p>
-                    Status pesanan setelah checkout: Menunggu diproses.
-                </p>
-                <p>
-                    Status pembayaran awal: Belum dibayar.
-                </p>
+            <div class="shop-status">
+                <span>Status pesanan setelah checkout: <strong>Menunggu diproses</strong></span>
+                <span>Status pembayaran awal: <strong>Belum dibayar</strong></span>
+            </div>
 
-                <button type="submit" class="btn">
-                    Konfirmasi Pesanan
-                </button>
-            </form>
-        </section>
-    </main>
-</body>
-</html>
+            <button type="submit" class="shop-btn shop-btn--block">
+                Konfirmasi pesanan
+            </button>
+        </form>
+
+    </div>
+
+</div>
+@endsection

@@ -1,115 +1,439 @@
-* {
-    box-sizing: border-box;
-}
+.transaction-page {
+    --trx-blue: #2347ff;
+    --trx-blue-dark: #1a36d1;
+    --trx-navy: #0c2a7a;
+    --trx-navy-deep: #071a4d;
+    --trx-blue-50: #f3f6ff;
+    --trx-blue-100: #e4ebff;
+    --trx-surface: #ffffff;
+    --trx-line: #e0e7fb;
+    --trx-text: #0e1a40;
+    --trx-muted: #5a6891;
+    --trx-green: #0b7a50;
+    --trx-green-soft: #dff5ec;
+    --trx-amber: #915c00;
+    --trx-amber-soft: #fff1d6;
+    --trx-red-dark: #b3262b;
+    --trx-red-soft: #ffe5e6;
+    --trx-radius: 20px;
+    --trx-shadow: 0 12px 32px -16px rgba(25, 55, 170, 0.28);
 
-body {
-    margin: 0;
-    background: #f5f5f5;
-    color: #222;
-    font-family: Arial, sans-serif;
-}
-
-.transaction-container {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 25px;
-    background: white;
-    border-radius: 8px;
-}
-
-.transaction-container h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-}
-
-.filter-form {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 25px;
-}
-
-.filter-group {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 20px;
+    width: 100%;
+    color: var(--trx-text);
 }
 
-.filter-group label {
+.transaction-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.transaction-hint {
+    color: var(--trx-muted);
+    font-size: 13.5px;
+}
+
+/* ---------- Tombol ---------- */
+
+.transaction-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4a6bff, var(--trx-blue));
+    box-shadow: 0 10px 20px -10px rgba(35, 71, 255, 0.7);
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.transaction-btn:hover {
+    background: linear-gradient(135deg, var(--trx-blue), var(--trx-blue-dark));
+}
+
+.transaction-btn:focus-visible {
+    outline: 3px solid rgba(35, 71, 255, 0.35);
+    outline-offset: 2px;
+}
+
+.transaction-btn--ghost {
+    background: var(--trx-surface);
+    border-color: var(--trx-line);
+    box-shadow: none;
+    color: var(--trx-navy);
+}
+
+.transaction-btn--ghost:hover {
+    background: var(--trx-blue-50);
+    border-color: var(--trx-blue);
+    color: var(--trx-blue);
+}
+
+.transaction-btn--small {
+    padding: 6px 14px;
+    border-radius: 10px;
+    box-shadow: none;
+    font-size: 13.5px;
+}
+
+/* ---------- Kartu ---------- */
+
+.transaction-card {
+    border: 1px solid var(--trx-line);
+    border-radius: var(--trx-radius);
+    background: var(--trx-surface);
+    box-shadow: var(--trx-shadow);
+}
+
+/* ---------- Filter ---------- */
+
+.transaction-filter {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+    padding: 22px 24px;
+}
+
+.transaction-field {
+    min-width: 0;
+}
+
+.transaction-field label {
+    display: block;
+    margin-bottom: 6px;
     font-size: 14px;
     font-weight: 600;
 }
 
-.filter-group input,
-.filter-group select {
+.transaction-field input,
+.transaction-field select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
+    padding: 11px 14px;
+    border: 1px solid var(--trx-line);
+    border-radius: 12px;
+    background: var(--trx-surface);
+    color: var(--trx-text);
+    font: inherit;
+    transition: border-color 0.18s, box-shadow 0.18s;
 }
 
-.filter-actions {
+.transaction-field input:focus,
+.transaction-field select:focus {
+    outline: none;
+    border-color: var(--trx-blue);
+    box-shadow: 0 0 0 4px rgba(35, 71, 255, 0.14);
+}
+
+.transaction-field input::placeholder {
+    color: #93a1bd;
+}
+
+.transaction-filter-actions {
     display: flex;
-    align-items: end;
     gap: 10px;
 }
 
-.filter-button,
-.reset-button {
-    padding: 10px 18px;
-    border-radius: 5px;
-    text-decoration: none;
-    cursor: pointer;
-    font-size: 14px;
+.transaction-filter .transaction-btn {
+    padding-top: 11px;
+    padding-bottom: 11px;
 }
 
-.filter-button {
-    border: none;
-    background: #222;
-    color: white;
-}
+/* ---------- Tabel ---------- */
 
-.reset-button {
-    background: #ddd;
-    color: #222;
+.transaction-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--trx-line);
+    border-radius: var(--trx-radius);
+    background: var(--trx-surface);
+    box-shadow: var(--trx-shadow);
 }
 
 .transaction-table {
     width: 100%;
+    min-width: 760px;
     border-collapse: collapse;
 }
 
 .transaction-table th,
 .transaction-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
+    padding: 14px 16px;
     text-align: left;
-    font-size: 14px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--trx-line);
 }
 
 .transaction-table th {
-    background: #222;
-    color: white;
+    background: var(--trx-blue-50);
+    color: var(--trx-navy);
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
-.transaction-table tr:nth-child(even) {
-    background: #f8f8f8;
+.transaction-table tbody tr:last-child td {
+    border-bottom: 0;
 }
 
-.detail-link {
-    color: #222;
+.transaction-table tbody tr:hover {
+    background: #f6f9ff;
+}
+
+.transaction-table tfoot td {
+    border-top: 2px solid var(--trx-line);
+    border-bottom: 0;
+    background: var(--trx-blue-50);
+    font-weight: 800;
+    color: var(--trx-navy-deep);
+}
+
+.transaction-table .is-num {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.transaction-code {
+    color: var(--trx-blue);
+    font-weight: 700;
+}
+
+.transaction-empty {
+    padding: 44px 20px !important;
+    text-align: center !important;
+    color: var(--trx-muted);
+}
+
+/* ---------- Lencana ---------- */
+
+.transaction-badge {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.transaction-badge--success { background: var(--trx-green-soft); color: var(--trx-green); }
+.transaction-badge--warning { background: var(--trx-amber-soft); color: var(--trx-amber); }
+.transaction-badge--danger  { background: var(--trx-red-soft);   color: var(--trx-red-dark); }
+.transaction-badge--muted   { background: #eceff6; color: #566080; }
+
+/* ---------- Paginasi ---------- */
+
+.transaction-pagination {
+    display: flex;
+    justify-content: center;
+}
+
+.transaction-pagination .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.transaction-pagination .page-link {
+    display: block;
+    min-width: 38px;
+    padding: 8px 12px;
+    border: 1px solid var(--trx-line);
+    border-radius: 10px;
+    background: var(--trx-surface);
+    color: var(--trx-navy);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+}
+
+.transaction-pagination a.page-link:hover {
+    background: var(--trx-blue-50);
+    border-color: var(--trx-blue);
+    color: var(--trx-blue);
+}
+
+.transaction-pagination .active .page-link {
+    border-color: transparent;
+    background: linear-gradient(135deg, #4a6bff, var(--trx-blue));
+    color: #fff;
+}
+
+.transaction-pagination .disabled .page-link {
+    background: var(--trx-blue-50);
+    color: #9aa7c7;
+}
+
+/* ---------- Ringkasan (detail) ---------- */
+
+.transaction-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.transaction-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px 22px;
+    border: 1px solid var(--trx-line);
+    border-radius: var(--trx-radius);
+    background: var(--trx-surface);
+    box-shadow: var(--trx-shadow);
+}
+
+.transaction-tile span {
+    color: var(--trx-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.transaction-tile strong {
+    color: var(--trx-navy-deep);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.transaction-tile--accent {
+    border-color: transparent;
+    background:
+        radial-gradient(circle at 90% 0%, rgba(90, 140, 255, 0.55), transparent 55%),
+        linear-gradient(120deg, var(--trx-navy-deep), var(--trx-navy) 55%, #1b45c9);
+    box-shadow: 0 20px 40px -22px rgba(12, 42, 122, 0.8);
+}
+
+.transaction-tile--accent span { color: #c3d4ff; }
+.transaction-tile--accent strong { color: #fff; }
+
+/* ---------- Informasi (detail) ---------- */
+
+.transaction-section {
+    padding: 26px 28px;
+}
+
+.transaction-section h2 {
+    margin: 0 0 16px;
+    color: var(--trx-navy);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.transaction-dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 32px;
+    margin: 0;
+}
+
+.transaction-dl > div {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--trx-line);
+}
+
+.transaction-dl dt {
+    color: var(--trx-muted);
+    font-size: 14px;
     font-weight: 600;
 }
 
-@media (max-width: 768px) {
-    .filter-form {
+.transaction-dl dd {
+    margin: 0;
+    font-weight: 600;
+}
+
+.transaction-items {
+    padding: 0;
+    overflow: hidden;
+}
+
+.transaction-items h2 {
+    margin: 0;
+    padding: 22px 28px 16px;
+}
+
+.transaction-items .transaction-table-wrap {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* ---------- Responsif ---------- */
+
+@media (max-width: 1280px) {
+    .transaction-filter {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .transaction-filter {
+        grid-template-columns: 1fr;
+        padding: 18px;
+    }
+
+    .transaction-filter-actions .transaction-btn {
+        flex: 1;
+    }
+
+    .transaction-dl {
         grid-template-columns: 1fr;
     }
 
-    .transaction-container {
-        margin: 10px;
-        padding: 15px;
-        overflow-x: auto;
+    .transaction-dl > div {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .transaction-section {
+        padding: 20px 18px;
+    }
+
+    .transaction-items h2 {
+        padding: 20px 18px 14px;
+    }
+}
+
+/* ---------- Cetak (struk detail) ---------- */
+
+@media print {
+    .sidebar,
+    .topbar,
+    .footer,
+    .transaction-toolbar {
+        display: none !important;
+    }
+
+    body {
+        display: block;
+        background: #fff !important;
+    }
+
+    .content {
+        padding: 0 !important;
+    }
+
+    .transaction-card,
+    .transaction-tile {
+        box-shadow: none !important;
     }
 }

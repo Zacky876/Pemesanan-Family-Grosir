@@ -1,197 +1,178 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>@yield('title', 'Admin') - Minimarket</title>
+    <title>@yield('title', 'Admin') - Youngmart</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    {{-- CSS & JS template (dipakai semua halaman admin) --}}
-    @vite([
-        'resources/css/admin/layouts.css',
-        'resources/js/admin/layouts.js'
-    ])
+    @vite(['resources/css/admin/layout.css'])
 
-    {{-- CSS khusus halaman: @push('styles') di halaman masing-masing --}}
     @stack('styles')
 </head>
-
 <body>
 
 @php
-    $menuGroups = [
-        'Utama' => [
-            ['label' => 'Dashboard', 'route' => 'admin.dashboard', 'match' => 'admin.dashboard',
-             'icon' => 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z'],
-        ],
-        'Katalog' => [
-            ['label' => 'Produk', 'route' => 'admin.products.index', 'match' => 'admin.products.*',
-             'icon' => 'M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8'],
-            ['label' => 'Kategori', 'route' => 'admin.categories.index', 'match' => 'admin.categories.*',
-             'icon' => 'M20 12l-8 8-9-9V3h8zM7.5 7.5h.01'],
-            ['label' => 'Stok', 'route' => 'admin.stock.index', 'match' => 'admin.stock.*',
-             'icon' => 'M12 3l9 5-9 5-9-5zM3 13l9 5 9-5'],
-        ],
-        'Penjualan' => [
-            ['label' => 'Transaksi', 'route' => 'admin.transactions.index', 'match' => 'admin.transactions.*',
-             'icon' => 'M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6'],
-            ['label' => 'Pembayaran', 'route' => 'admin.payments.index', 'match' => 'admin.payments.*',
-             'icon' => 'M3 6h18v12H3zM3 10h18'],
-            ['label' => 'Pelanggan', 'route' => 'admin.customers.index', 'match' => 'admin.customers.*',
-             'icon' => 'M16 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M21 20v-2a4 4 0 0 0-3-3.9'],
-        ],
-        'Laporan' => [
-            ['label' => 'Laporan', 'route' => 'admin.reports.index', 'match' => 'admin.reports.*',
-             'icon' => 'M4 20V10M10 20V4M16 20v-7M22 20H2'],
-        ],
+    $rt = fn ($name) => \Illuminate\Support\Facades\Route::has($name) ? route($name) : '#';
+
+    $link = [
+        'dashboard'  => $rt('admin.dashboard'),
+        'produk'     => $rt('admin.products.index'),
+        'kategori'   => $rt('admin.categories.index'),
+        'stok'       => $rt('admin.stock.index'),
+        'transaksi'  => $rt('admin.transactions.index'),
+        'pembayaran' => $rt('admin.payments.index'),
+        'pelanggan'  => $rt('admin.customers.index'),
+        'laporan'    => $rt('admin.reports.index'),
+        'logout'     => \Illuminate\Support\Facades\Route::has('logout') ? route('logout') : url('/logout'),
     ];
 
-    $user = auth()->user();
-    $initial = strtoupper(mb_substr($user->name, 0, 1));
+    // Menu yang sedang aktif (cocokkan dengan nama route)
+    $aktif = fn (string $pola) => request()->routeIs($pola) ? 'active' : '';
+
+    $nama = auth()->user()->name ?? 'Administrator';
 @endphp
 
-<div class="layout">
-
-    {{-- ================= SIDEBAR ================= --}}
-    <aside class="sidebar" id="sidebar" aria-label="Menu admin">
-
-        <div class="sidebar-brand">
-            <span class="brand-mark" aria-hidden="true">M</span>
-            <div>
-                <strong>Minimarket</strong>
-                <small>Panel admin</small>
-            </div>
+{{-- ================= SIDEBAR ================= --}}
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo brand-logo--img">
+            <img src="{{ asset('images/logo-youngmart.png') }}" alt="Youngmart">
         </div>
+        <span>Panel admin</span>
+    </div>
 
-        <nav class="sidebar-nav">
-            @foreach ($menuGroups as $group => $items)
-                <p class="nav-title">{{ $group }}</p>
+    <div class="nav-group">
+        <div class="nav-title">Utama</div>
+        <a href="{{ $link['dashboard'] }}" class="nav-link {{ $aktif('admin.dashboard') }}">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            Dashboard
+        </a>
+    </div>
 
-                @foreach ($items as $item)
-                    @php
-                        $href = Route::has($item['route']) ? route($item['route']) : '#';
-                        $active = request()->routeIs($item['match']);
-                    @endphp
+    <div class="nav-group">
+        <div class="nav-title">Katalog</div>
+        <a href="{{ $link['produk'] }}" class="nav-link {{ $aktif('admin.products.*') }}">
+            <svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
+            Produk
+        </a>
+        <a href="{{ $link['kategori'] }}" class="nav-link {{ $aktif('admin.categories.*') }}">
+            <svg viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>
+            Kategori
+        </a>
+        <a href="{{ $link['stok'] }}" class="nav-link {{ $aktif('admin.stock.*') }}">
+            <svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>
+            Stok
+        </a>
+    </div>
 
-                    <a href="{{ $href }}"
-                       class="nav-link {{ $active ? 'is-active' : '' }}"
-                       @if ($active) aria-current="page" @endif>
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="{{ $item['icon'] }}" />
-                        </svg>
-                        <span>{{ $item['label'] }}</span>
-                    </a>
-                @endforeach
-            @endforeach
-        </nav>
+    <div class="nav-group">
+        <div class="nav-title">Penjualan</div>
+        <a href="{{ $link['transaksi'] }}" class="nav-link {{ $aktif('admin.transactions.*') }}">
+            <svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>
+            Transaksi
+        </a>
+        <a href="{{ $link['pembayaran'] }}" class="nav-link {{ $aktif('admin.payments.*') }}">
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
+            Pembayaran
+        </a>
+        <a href="{{ $link['pelanggan'] }}" class="nav-link {{ $aktif('admin.customers.*') }}">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Pelanggan
+        </a>
+    </div>
 
-        <div class="sidebar-user">
-            <span class="avatar" aria-hidden="true">{{ $initial }}</span>
-            <div class="user-info">
-                <strong>{{ $user->name }}</strong>
-                <small>{{ $user->role }}</small>
-            </div>
+    <div class="nav-group">
+        <div class="nav-title">Laporan</div>
+        <a href="{{ $link['laporan'] }}" class="nav-link {{ $aktif('admin.reports.*') }}">
+            <svg viewBox="0 0 24 24"><path d="M4 20V4M4 20h16M9 16v-5M14 16V8M19 16v-3"/></svg>
+            Laporan
+        </a>
+    </div>
 
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="logout-button" title="Keluar" aria-label="Keluar">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
-                         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
-                    </svg>
-                </button>
-            </form>
+    <div class="sidebar-user" style="margin-top:28px">
+        <div class="avatar">{{ strtoupper(substr($nama, 0, 1)) }}</div>
+        <div>
+            <b>{{ $nama }}</b>
+            <span>Admin</span>
         </div>
-
-    </aside>
-
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    {{-- ================= AREA UTAMA ================= --}}
-    <div class="main">
-
-        {{-- ---------- HEADER ---------- --}}
-        <header class="topbar">
-            <button type="button" class="menu-toggle" id="menuToggle"
-                    aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" aria-hidden="true">
-                    <path d="M4 7h16M4 12h16M4 17h16" />
-                </svg>
+        <form method="POST" action="{{ $link['logout'] }}">
+            @csrf
+            <button type="submit" class="logout-btn" title="Keluar" aria-label="Keluar">
+                <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
             </button>
+        </form>
+    </div>
+</aside>
 
-            <div class="topbar-title">
-                <h1>@yield('page_title', 'Dashboard')</h1>
-                @hasSection('page_subtitle')
-                    <p>@yield('page_subtitle')</p>
-                @endif
+{{-- ================= MAIN ================= --}}
+<div class="main">
+    <header class="topbar">
+        <div>
+            <h1>@yield('page_title', 'Admin')</h1>
+            @hasSection('page_subtitle')
+                <p>@yield('page_subtitle')</p>
+            @endif
+        </div>
+        <div class="profile-chip">
+            <div class="avatar">{{ strtoupper(substr($nama, 0, 1)) }}</div>
+            <div>
+                <b>{{ $nama }}</b>
+                <span>Admin</span>
             </div>
+        </div>
+    </header>
 
-            <div class="user-chip">
-                <span class="avatar avatar--small" aria-hidden="true">{{ $initial }}</span>
+    <main class="content">
+        {{-- Pesan sukses / error otomatis --}}
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-error">{{ session('error') }}</div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-error">
                 <div>
-                    <strong>{{ $user->name }}</strong>
-                    <small>{{ $user->role }}</small>
-                </div>
-            </div>
-        </header>
-
-        {{-- ---------- ISI HALAMAN ---------- --}}
-        <main class="content">
-
-            @if (session('success'))
-                <div class="ui-alert ui-alert--success" role="status" data-autohide>{{ session('success') }}</div>
-            @endif
-
-            @if (session('error'))
-                <div class="ui-alert ui-alert--error" role="alert">{{ session('error') }}</div>
-            @endif
-
-            @if ($errors->any())
-                <div class="ui-alert ui-alert--error" role="alert">
+                    Data belum bisa disimpan. Periksa isian berikut:
                     <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
-            @endif
+            </div>
+        @endif
 
-            @yield('content')
+        @yield('content')
+    </main>
 
-        </main>
-
-        {{-- ---------- FOOTER ---------- --}}
-        <footer class="footer">
+    <footer class="footer">
+        <div class="footer-top">
             <div class="footer-brand">
-                <span class="brand-mark brand-mark--small" aria-hidden="true">M</span>
+                <div class="brand-logo">YM</div>
                 <div>
-                    <strong>Minimarket</strong>
-                    <p>Sistem penjualan dan pengelolaan toko berbasis web.</p>
+                    <b>Youngmart Grub</b>
+                    <span>Sistem penjualan dan pengelolaan toko berbasis web.</span>
                 </div>
             </div>
-
-            <nav class="footer-links" aria-label="Tautan footer">
-                <a href="{{ Route::has('admin.reports.index') ? route('admin.reports.index') : '#' }}">Laporan</a>
-                <a href="{{ Route::has('admin.payments.index') ? route('admin.payments.index') : '#' }}">Pembayaran</a>
+            <div class="footer-links">
+                <a href="{{ $link['laporan'] }}">Laporan</a>
+                <a href="{{ $link['pembayaran'] }}">Pembayaran</a>
                 <a href="#">Bantuan</a>
-            </nav>
-
-            <p class="footer-copy">&copy; {{ date('Y') }} Minimarket. Dibuat dengan Laravel.</p>
-        </footer>
-
-    </div>
+            </div>
+        </div>
+        <div class="copy">&copy; {{ date('Y') }} Youngmart Grub.</div>
+    </footer>
 </div>
 
 @stack('scripts')
-
 </body>
-
 </html>

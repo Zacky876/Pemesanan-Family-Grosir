@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $query = Product::with('category');
 
         // Search produk
@@ -40,36 +39,46 @@ class ProductController extends Controller
         ));
     }
 
-    public function create()
-    {
-        $categories = Category::orderBy('name')->get();
+    private function generateProductCode(){
+        $lastProduct = Product::orderBy('id', 'desc')->first();
 
-        return view('admin.products.create', compact('categories'));
+        if (!$lastProduct) {
+            return 'PRD001';
+        }
+
+        $lastNumber = (int) substr($lastProduct->code, 3);
+
+        $nextNumber = $lastNumber + 1;
+
+        return 'PRD' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     }
 
-    public function store(Request $request)
-    {
+    public function create() {
+        $categories = Category::orderBy('name')->get();
+        $nextCode = $this->generateProductCode();
+
+        return view('admin.products.create', compact('categories', 'nextCode'));
+    }
+
+    public function store(Request $request) {
         $validated = $request->validate([
-            'category_id' => ['required', 'exists:categories,id'],
-            'code' => ['required', 'string', 'max:50', 'unique:products,code'],
-            'name' => ['required', 'string', 'max:150'],
-            'purchase_price' => ['required', 'numeric', 'min:0'],
-            'selling_price' => ['required', 'numeric', 'min:0'],
-            'stock' => ['required', 'integer', 'min:0'],
-            'unit' => ['required', 'string', 'max:30'],
-            'photo' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048'
-            ],
-            'status' => ['required', 'in:active,inactive'],
-            'description' => ['nullable', 'string'],
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'unit' => 'required|string',
+            'purchase_price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'status' => 'required|in:active,inactive',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'description' => 'nullable|string',
         ]);
 
+        // Kode produk dibuat otomatis
+        $validated['code'] = $this->generateProductCode();
+
+        // Upload foto jika ada
         if ($request->hasFile('photo')) {
-            $validated['photo'] = $request
-                ->file('photo')
+            $validated['photo'] = $request->file('photo')
                 ->store('products', 'public');
         }
 
