@@ -1,198 +1,162 @@
-// Grafik dashboard admin.
-// Data dikirim dari Blade lewat <script type="application/json" id="dashboard-data">.
-// Library Chart.js dimuat dari CDN sebelum file ini (lihat dashboard.blade.php).
+import Chart from 'chart.js/auto';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const dataEl = document.getElementById('dashboard-data');
+// Format Rupiah
+const rupiah = value =>
+    'Rp ' + new Intl.NumberFormat('id-ID').format(value);
 
-    if (!dataEl || typeof Chart === 'undefined') {
-        return;
-    }
-
-    const d = JSON.parse(dataEl.textContent);
-
-    // Palet warna (sama dengan tema login dan sidebar)
-    const biru = '#2347ff';
-    const navy = '#0c2a7a';
-    const oranye = '#ff7a2f';
-    const sky = '#38bdf8';
-    const grid = '#e6ebfa';
-
-    Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
-    Chart.defaults.color = '#5d6b8f';
-    Chart.defaults.maintainAspectRatio = false;
-
-    const legendBawah = {
-        position: 'bottom',
-        labels: { usePointStyle: true, boxWidth: 8, padding: 14 },
-    };
-
-    const sumbu = {
-        x: { grid: { display: false } },
-        y: { grid: { color: grid }, border: { display: false }, beginAtZero: true },
-    };
-
-    const buat = (id, config) => {
-        const el = document.getElementById(id);
-        if (el) new Chart(el, config);
-    };
-
-    // Penjualan 7 bulan terakhir
-    buat('chartPenjualan', {
-        type: 'line',
-        data: {
-            labels: d.labelBulan,
-            datasets: [{
-                label: 'Penjualan (juta Rp)',
-                data: d.dataPenjualan,
-                borderColor: biru,
-                backgroundColor: (ctx) => {
-                    const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 270);
-                    g.addColorStop(0, 'rgba(35,71,255,.30)');
-                    g.addColorStop(1, 'rgba(56,189,248,0)');
-                    return g;
-                },
-                fill: true,
-                tension: 0.38,
-                borderWidth: 3,
-                pointRadius: 4,
-                pointBackgroundColor: '#fff',
-                pointBorderColor: biru,
-                pointBorderWidth: 2,
-            }],
-        },
-        options: { plugins: { legend: { display: false } }, scales: sumbu },
-    });
-
-    // Produk per kategori
-    buat('chartKategori', {
-        type: 'doughnut',
-        data: {
-            labels: d.kategoriLabel,
-            datasets: [{
-                data: d.kategoriData,
-                backgroundColor: [biru, sky, oranye, navy, '#b8c6ff'],
-                borderWidth: 3,
-                borderColor: '#fff',
-            }],
-        },
-        options: { cutout: '62%', plugins: { legend: legendBawah } },
-    });
-
-    // Transaksi per hari
-    buat('chartTransaksi', {
-        type: 'bar',
-        data: {
-            labels: d.labelHari,
-            datasets: [{
-                label: 'Transaksi',
-                data: d.dataTransaksi,
-                backgroundColor: (ctx) => {
-                    const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 240);
-                    g.addColorStop(0, sky);
-                    g.addColorStop(1, biru);
-                    return g;
-                },
-                borderRadius: 8,
-                borderSkipped: false,
-                maxBarThickness: 28,
-            }],
-        },
-        options: { plugins: { legend: { display: false } }, scales: sumbu },
-    });
-
-    // Metode pembayaran
-    buat('chartPembayaran', {
-        type: 'doughnut',
-        data: {
-            labels: d.metodeLabel,
-            datasets: [{
-                data: d.metodeData,
-                backgroundColor: [navy, biru, sky],
-                borderWidth: 3,
-                borderColor: '#fff',
-            }],
-        },
-        options: { cutout: '62%', plugins: { legend: legendBawah } },
-    });
-
-    // Pendapatan dan laba
-    buat('chartLaba', {
-        type: 'line',
-        data: {
-            labels: d.labelMinggu,
-            datasets: [
-                {
-                    label: 'Pendapatan',
-                    data: d.dataPendapatan,
-                    borderColor: biru,
-                    backgroundColor: 'rgba(35,71,255,.08)',
-                    fill: true,
-                    tension: 0.38,
-                    borderWidth: 3,
-                    pointRadius: 3,
-                    pointBackgroundColor: biru,
-                },
-                {
-                    label: 'Laba',
-                    data: d.dataLaba,
-                    borderColor: oranye,
-                    backgroundColor: 'rgba(255,122,47,.08)',
-                    fill: true,
-                    tension: 0.38,
-                    borderWidth: 3,
-                    pointRadius: 3,
-                    pointBackgroundColor: oranye,
-                },
-            ],
-        },
-        options: {
-            interaction: { mode: 'index', intersect: false },
-            plugins: { legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8 } } },
-            scales: sumbu,
-        },
-    });
-
-    // Target bulan ini
-    buat('chartTarget', {
-        type: 'doughnut',
-        data: {
-            labels: ['Tercapai', 'Sisa target'],
-            datasets: [{
-                data: [d.penjualanBulan, d.sisaTarget],
-                backgroundColor: [biru, '#e4ebff'],
-                borderWidth: 0,
-            }],
-        },
-        options: { cutout: '78%', plugins: { legend: { display: false } } },
-    });
-
-    // Produk terlaris
-    buat('chartTerlaris', {
-        type: 'bar',
-        data: {
-            labels: d.terlarisLabel,
-            datasets: [{
-                label: 'Terjual',
-                data: d.terlarisData,
-                backgroundColor: (ctx) => {
-                    const g = ctx.chart.ctx.createLinearGradient(0, 0, 260, 0);
-                    g.addColorStop(0, sky);
-                    g.addColorStop(1, biru);
-                    return g;
-                },
-                borderRadius: 8,
-                borderSkipped: false,
-                maxBarThickness: 18,
-            }],
-        },
-        options: {
-            indexAxis: 'y',
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { grid: { color: grid }, border: { display: false }, beginAtZero: true },
-                y: { grid: { display: false }, ticks: { font: { size: 11.5 } } },
-            },
-        },
-    });
+// Membaca data dari Blade
+const getData = canvas => ({
+    labels: JSON.parse(canvas.dataset.labels || '[]'),
+    values: JSON.parse(canvas.dataset.values || '[]')
 });
+
+// Menampilkan pesan kosong
+const emptyChart = canvas => {
+    canvas.parentElement.innerHTML =
+        '<div class="chart-empty">Belum ada data.</div>';
+};
+
+// ===================================
+// GRAFIK PENDAPATAN
+// ===================================
+
+const revenueCanvas = document.getElementById('revenueChart');
+
+if (revenueCanvas) {
+    const { labels, values } = getData(revenueCanvas);
+
+    if (values.length === 0) {
+        emptyChart(revenueCanvas);
+    } else {
+        new Chart(revenueCanvas, {
+            type: 'line',
+
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Pendapatan',
+                    data: values,
+                    borderColor: '#3867f5',
+                    backgroundColor: 'rgba(56,103,245,0.12)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 4,
+                    pointHoverRadius: 7
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: context =>
+                                'Pendapatan: ' + rupiah(context.raw)
+                        }
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            callback: value =>
+                                'Rp ' + new Intl.NumberFormat('id-ID', {
+                                    notation: 'compact'
+                                }).format(value)
+                        },
+
+                        grid: {
+                            color: '#f0f2f5'
+                        }
+                    },
+
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// ===================================
+// GRAFIK KATEGORI TERLARIS
+// ===================================
+
+const categoryCanvas = document.getElementById('categoryChart');
+
+if (categoryCanvas) {
+    const { labels, values } = getData(categoryCanvas);
+
+    if (labels.length === 0 || values.length === 0) {
+        emptyChart(categoryCanvas);
+    } else {
+        new Chart(categoryCanvas, {
+            type: 'doughnut',
+
+            data: {
+                labels,
+                datasets: [{
+                    data: values,
+
+                    backgroundColor: [
+                        '#3867f5',
+                        '#13b8a6',
+                        '#ff9635',
+                        '#8b5cf6',
+                        '#ec4899',
+                        '#facc15',
+                        '#14b8a6',
+                        '#64748b',
+                        '#f97316',
+                        '#06b6d4'
+                    ],
+
+                    borderWidth: 3,
+                    borderColor: '#ffffff',
+                    hoverOffset: 8
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: context =>
+                                `${context.label}: ${context.raw} produk terjual`
+                        }
+                    }
+                }
+            }
+        });
+    }
+}

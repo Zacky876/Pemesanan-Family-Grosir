@@ -442,6 +442,13 @@
     border-bottom: 0;
 }
 
+.product-code-readonly {
+    background-color: #f1f1f1;
+    color: #555;
+    cursor: not-allowed;
+    border: 1px solid #ddd;
+}
+
 /* ---------- Responsif ---------- */
 
 @media (max-width: 720px) {

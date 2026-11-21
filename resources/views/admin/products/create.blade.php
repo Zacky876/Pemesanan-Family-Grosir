@@ -34,12 +34,14 @@
             <div class="product-grid">
 
                 <div class="product-field">
-                    <label for="code">Kode produk <span class="req">*</span></label>
-                    <input type="text" id="code" name="code"
-                           value="{{ old('code') }}"
-                           class="@error('code') is-invalid @enderror"
-                           placeholder="Contoh: PRD001" required>
-                    @error('code') <span class="product-error">{{ $message }}</span> @enderror
+                    <label for="code">Kode produk</label>
+
+                    <input type="text"
+                        id="code"
+                        name="code"
+                        value="{{ $nextCode ?? '' }}"
+                        readonly
+                        class="product-code-readonly">
                 </div>
 
                 <div class="product-field">
